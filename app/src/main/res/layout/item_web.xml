@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="horizontal"
+    android:layout_marginTop="10dp">
+
+    <LinearLayout
+        android:id="@+id/collection_web_layout"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+    <TextView
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:id="@+id/web_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:text="web名字123123121231232131231312"/>
+
+
+        <TextView
+            android:id="@+id/web_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="https:github.com"/>
+
+
+
+    </LinearLayout>
+
+
+
+    <ImageView
+        android:layout_marginLeft="10dp"
+        android:id="@+id/web_love_icon"
+        android:layout_gravity="center"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/item_collect_icon"
+        />
+
+</LinearLayout>

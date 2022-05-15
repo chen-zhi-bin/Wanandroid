@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#8000">
+
+    <RelativeLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:padding="5dp"
+        android:background="@color/white"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:id="@+id/dialog_title"
+            android:text="收藏"
+            android:textSize="20sp" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/dialog_choice"
+                android:layout_below="@+id/dialog_title">
+
+                <RadioButton
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/dialog_collect_article"
+                    android:textColor="@color/black"
+                    android:text="@string/article"
+                    android:checked="true"
+                    />
+                <RadioButton
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/dialog_collect_web"
+                    android:textColor="@color/black"
+                    android:text="@string/web"
+                    />
+
+            </RadioGroup>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/dialog_collect_title"
+            android:hint="标题"
+            android:layout_below="@+id/dialog_choice"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/dialog_collect_author"
+            android:hint="作者"
+            android:layout_below="@+id/dialog_collect_title"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/dialog_collect_link"
+            android:hint="网站url"
+            android:layout_below="@+id/dialog_collect_author"
+            />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dialog_collect_link"
+            >
+
+            <TextView
+                android:id="@+id/dialog_cancel_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="取消"
+                android:gravity="center_horizontal|center_vertical"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/dialog_sure_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:text="确定"
+                android:gravity="center_horizontal|center_vertical"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

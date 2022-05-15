@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">WanAndroidDemo</string>
+    <string name="title_username">用户名</string>
+    <string name="title_login">登录</string>
+    <string name="user_login_register">登录/注册</string>
+    <string name="article">文章</string>
+    <string name="web">网站</string>
+
+    <string-array name="indicator_title">
+        <item>文章</item>
+        <item>网站</item>
+    </string-array>
+</resources>

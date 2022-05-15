@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/test_layout"
+    tools:context=".ui.activity.test.TestActivity">
+
+    <com.ldoublem.loadingviewlib.view.LVCircularRing
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/test_ring"/>
+
+    <TextView
+        android:id="@+id/test_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="登录"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_marginTop="50dp"
+        android:id="@+id/test_shu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="数据"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/test_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="{{uaobfoaufbqoq,naoivbqbqoibpqi,anoviqvqo}}"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:backgroundTint="@color/color_grey"
+        android:id="@+id/test_collect"
+        android:layout_margin="16dp"
+        />
+</LinearLayout>
