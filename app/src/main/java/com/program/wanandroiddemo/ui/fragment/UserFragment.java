@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.base.BaseFragment;
 import com.program.wanandroiddemo.presenter.IUserLoginPresenter;
+import com.program.wanandroiddemo.ui.activity.MainActivity;
 import com.program.wanandroiddemo.ui.activity.user.UserCollectActivity;
 import com.program.wanandroiddemo.ui.activity.user.UserInfoActivity;
 import com.program.wanandroiddemo.ui.activity.user.UserLoginActivity;
@@ -62,7 +63,6 @@ public class UserFragment extends BaseFragment {
         Context context = getAppContext();
         mSPUtils = SharedPreferencesUtils.getInstance(context);
         String token = mSPUtils.getString("token_press");
-        initUser();
         setupState(State.SUCCESS);
         userLoginOrName = false;
 
@@ -73,24 +73,6 @@ public class UserFragment extends BaseFragment {
         onRefersh();
     }
 
-    //判断cookie是否过期
-    private void initUser() {
-        long timeNow=0;
-        long time=0;
-        DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss", Locale.ENGLISH);
-        try {
-            time = Long.parseLong(mSPUtils.getString(SharedPreferencesUtils.USER_TOKEN_COOKIE_TIME));
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-            String s = dateFormat.format(new Date());
-            timeNow = dateFormat.parse(s).getTime();
-            LogUtils.d(UserFragment.this,"timeNow ="+timeNow);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (time<=timeNow){
-            mSPUtils.clear();
-        }
-    }
 
     /**
      * 用户初始化或刷新信息
@@ -132,6 +114,7 @@ public class UserFragment extends BaseFragment {
                     //有名字就点击无效
                     LogUtils.d(UserFragment.this,"onClick login="+getAppContext());
                     startActivity(new Intent(getContext(), UserLoginActivity.class));
+
                 }
             }
         });

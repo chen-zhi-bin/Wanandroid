@@ -18,6 +18,7 @@ public class SharedPreferencesUtils {
     public static final String USER_NAME = "name";                                      //name
     public static final String USER_TOKEN_COOKIE = "token_press";                       //token
     public static final String USER_TOKEN_COOKIE_TIME = "token_time";                   //有效时间
+    public static final String NEED_REFRESH = "NEED_REFRESH";                   //有效时间
 
 
     private SharedPreferencesUtils(Context context) {

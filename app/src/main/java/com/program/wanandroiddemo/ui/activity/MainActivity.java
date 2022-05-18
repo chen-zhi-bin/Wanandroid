@@ -5,7 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -13,11 +17,14 @@ import android.widget.Toast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.base.BaseActivity;
+import com.program.wanandroiddemo.base.BaseApplication;
 import com.program.wanandroiddemo.base.BaseFragment;
 import com.program.wanandroiddemo.ui.fragment.RecommendFragment;
 import com.program.wanandroiddemo.ui.fragment.SystemFragment;
 import com.program.wanandroiddemo.ui.fragment.UserFragment;
+import com.program.wanandroiddemo.utils.Constants;
 import com.program.wanandroiddemo.utils.LogUtils;
+import com.program.wanandroiddemo.utils.SharedPreferencesUtils;
 
 import butterknife.BindView;
 
@@ -53,6 +60,7 @@ public class MainActivity extends BaseActivity {
         return R.layout.activity_main;
     }
 
+
     private void initFragments() {
         mFm = getSupportFragmentManager();
         mRecommendFragment = new RecommendFragment();
@@ -60,6 +68,7 @@ public class MainActivity extends BaseActivity {
         mUserFragment = new UserFragment();
 
         //默认选中推荐，不然会出现空白页
+
         switchFragment(mRecommendFragment);
     }
 
@@ -69,16 +78,17 @@ public class MainActivity extends BaseActivity {
         mNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
                 switch (item.getItemId()){
                     case R.id.home:
                         LogUtils.d(MainActivity.this,"切换到首页");
+//                        mRecommendFragment = new RecommendFragment();
                         switchFragment(mRecommendFragment);
                         break;
                     case R.id.system:
                         LogUtils.d(MainActivity.this,"切换到体系");
                         switchFragment(mSystemFragment);
                         break;
-
                     case R.id.user:
                         LogUtils.d(MainActivity.this,"切换到个人");
                         switchFragment(mUserFragment);

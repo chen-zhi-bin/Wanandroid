@@ -2,6 +2,7 @@ package com.program.wanandroiddemo.presenter.Impl;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Message;
 
 import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.model.Api;
@@ -10,6 +11,7 @@ import com.program.wanandroiddemo.presenter.IUserLoginPresenter;
 import com.program.wanandroiddemo.presenter.utils.DataUtils;
 import com.program.wanandroiddemo.presenter.utils.GetCollectionIds;
 import com.program.wanandroiddemo.ui.custom.LoadingDialog;
+import com.program.wanandroiddemo.utils.Constants;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.PresenterManager;
 import com.program.wanandroiddemo.utils.RetrofitManager;
@@ -53,7 +55,6 @@ public class UserLoginPresenterImpl implements IUserLoginPresenter {
 
 //        LogUtils.d(UserPresenterImpl.this,"context asdasda=="+(Activity)context);
 
-        //这个对话框的提示和下面那个一样，推荐这个
 //        com.dyhdyh.widget.loading.dialog.LoadingDialog.make(mDialogActivity)
 //                .setMessage("正在登录")
 //                .show();
@@ -81,13 +82,12 @@ public class UserLoginPresenterImpl implements IUserLoginPresenter {
                     String time="";
                     for (String string : strings) {
                         token +=string;
-
                         if (string.contains("loginUserName=")){
                             time+=string;
                         }
                     }
 
-                    //报错token时效
+                    //保存token时效
                     //loginUserName=speak_dream; Expires=Sat, 11-Jun-2022 13:04:31 GMT; Path=/
                     LogUtils.d(UserLoginPresenterImpl.this,"token_cookie_time"+time);
                     String tiemData=time.substring(time.indexOf(",")+2,time.indexOf(",")+22);
@@ -109,6 +109,7 @@ public class UserLoginPresenterImpl implements IUserLoginPresenter {
                     UserInformation userData = response.body();
                     sp.putString(SharedPreferencesUtils.USER_TOKEN_COOKIE,token);
                     sp.putString(SharedPreferencesUtils.USER_NAME,userData.getData().getNickname());
+                    sp.putString(SharedPreferencesUtils.NEED_REFRESH,SharedPreferencesUtils.NEED_REFRESH);
 
                     mGetCollectionIds.setIds(data.getData().getCollectIds());
 
@@ -117,7 +118,6 @@ public class UserLoginPresenterImpl implements IUserLoginPresenter {
                 }else {
                     ToastUtils.showToast("登录失败,"+response.body().getErrorMsg());
                 }
-
 //                LoadingDialog.cancel();
                 loadingDialog.dismiss();
 

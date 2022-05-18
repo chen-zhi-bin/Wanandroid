@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.model.domain.CollectionArticle;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
+import com.program.wanandroiddemo.presenter.utils.GetCollectionIds;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.SearchUtil;
 
@@ -42,6 +44,16 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
         RecommendTitle.DataBean.DatasBean datasBean = mData.get(position);
         LogUtils.d("DEBUG","holdder setData=="+datasBean);
         holder.setData(datasBean);
+
+        holder.mLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mContentItemClickListener != null) {
+                    mContentItemClickListener.onItemClick(datasBean);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -57,17 +69,29 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
         notifyDataSetChanged();
     }
 
+    public void addData(RecommendTitle data){
+        int olderSize = mData.size();
+        mData.addAll(data.getData().getDatas());
+        notifyItemChanged(olderSize,data.getData().getDatas().size());
+    }
+
     public void setCollectionData(List<Integer> ids){
-        if (ids.size()>0){
-            this.mCollectionIds.clear();
-            this.mCollectionIds.addAll(ids);
-            notifyDataSetChanged();
-        }
+       if (ids!=null){
+           if (ids.size()>0){
+               this.mCollectionIds.clear();
+               this.mCollectionIds.addAll(ids);
+               LogUtils.d(RecommendAdapter.this,"idssssss ="+mCollectionIds);
+               notifyDataSetChanged();
+           }
+       }
     }
 
     public class InnerHolder extends RecyclerView.ViewHolder {
 
         SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd");
+
+        @BindView(R.id.article_data)
+        public LinearLayout mLayout;
 
         @BindView(R.id.article_title)
         public TextView RecommendTitleTv;
@@ -90,13 +114,14 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
         }
 
         public void setData(RecommendTitle.DataBean.DatasBean datasBean) {
+            LogUtils.d(RecommendAdapter.this,"dataBean="+datasBean);
             RecommendTitleTv.setText(datasBean.getTitle());
             author.setText(datasBean.getAuthor().equals(" ")?"作者:"+datasBean.getAuthor():"分享人:"+datasBean.getShareUser());
             sort.setText(datasBean.getSuperChapterName()+"/"+datasBean.getChapterName());
             long t = datasBean.getPublishTime();
             time.setText(longTime2String(t));
 
-            LogUtils.d(RecommendAdapter.this,"siez ="+mCollectionIds.size());
+            LogUtils.d(RecommendAdapter.this,"size ="+mCollectionIds.size());
             int collection = SearchUtil.Search(mCollectionIds, datasBean.getId());
             LogUtils.d(RecommendAdapter.this,"recomenda asofbasof "+datasBean.getId());
             if (collection!=-1){
@@ -124,7 +149,7 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
          * item点击事件
          * @param data
          */
-        void onTitleClick(RecommendTitle.DataBean.DatasBean data);
+        void onItemClick(RecommendTitle.DataBean.DatasBean data);
         /**
          * 收藏点击事件
          */

@@ -2,6 +2,8 @@ package com.program.wanandroiddemo.ui.activity.user;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Message;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -10,6 +12,8 @@ import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.base.BaseActivity;
 import com.program.wanandroiddemo.base.BaseApplication;
 import com.program.wanandroiddemo.presenter.IUserLoginPresenter;
+import com.program.wanandroiddemo.ui.activity.MainActivity;
+import com.program.wanandroiddemo.utils.Constants;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.PresenterManager;
 import com.program.wanandroiddemo.utils.ToastUtils;
@@ -65,7 +69,6 @@ public class UserLoginActivity extends BaseActivity implements ILoginCallback {
                 }else {
                     mLoginPresenter.getUserLogin(name, psw, mContext);
                     LogUtils.d(UserLoginActivity.this,"正在登录");
-
                 }
             }
         });
@@ -75,8 +78,15 @@ public class UserLoginActivity extends BaseActivity implements ILoginCallback {
 
     @Override
     public void onResultLogin() {
+//        Intent intent = new Intent(this, MainActivity.class);
+//        startActivity(intent);
         this.finish();
     }
 
-
+    @Override
+    public void onBackPressed() {
+//        Intent intent = new Intent(this, MainActivity.class);
+//        startActivity(intent);
+        this.finish();
+    }
 }

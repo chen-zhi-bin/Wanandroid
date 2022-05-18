@@ -1,34 +1,44 @@
 package com.program.wanandroiddemo.ui.fragment;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.base.BaseActivity;
 import com.program.wanandroiddemo.base.BaseApplication;
 import com.program.wanandroiddemo.base.BaseFragment;
+import com.program.wanandroiddemo.model.domain.CollectionArticle;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
 import com.program.wanandroiddemo.presenter.IRecommendTitlePresenter;
 import com.program.wanandroiddemo.presenter.utils.DataUtils;
 import com.program.wanandroiddemo.presenter.utils.GetCollectionIds;
+import com.program.wanandroiddemo.ui.activity.DetailsActivity;
 import com.program.wanandroiddemo.ui.adapter.RecommendAdapter;
+import com.program.wanandroiddemo.utils.Constants;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.PresenterManager;
+import com.program.wanandroiddemo.utils.SharedPreferencesUtils;
 import com.program.wanandroiddemo.utils.SizeUtils;
+import com.program.wanandroiddemo.utils.ToastUtils;
 import com.program.wanandroiddemo.view.IRecommendTitleCallback;
 
 import java.util.List;
 
 import butterknife.BindView;
 
-public class RecommendFragment extends BaseFragment implements  IRecommendTitleCallback {
+public class RecommendFragment extends BaseFragment implements IRecommendTitleCallback, RecommendAdapter.OnRecommendTitleItemClickListener {
 
     @BindView(R.id.home_recommend_title)
     public RecyclerView mContentRv;
@@ -36,6 +46,8 @@ public class RecommendFragment extends BaseFragment implements  IRecommendTitleC
     @BindView(R.id.fragment_bar_title_tv)
     public TextView barTitleTv;
 
+    @BindView(R.id.recommend_refresh)
+    public TwinklingRefreshLayout mRefreshLayout;
 
 
     private RecommendAdapter mRecommendAdapter;
@@ -74,8 +86,8 @@ public class RecommendFragment extends BaseFragment implements  IRecommendTitleC
                 outRect.right = SizeUtils.dip2px(getContext(), 2.5f);
             }
         });
-
-        mGetCollectionIds = DataUtils.getInstance().getGetCollectionIds();
+        mRefreshLayout.setEnableLoadmore(true);
+        mRefreshLayout.setEnableRefresh(true);
     }
 
     @Override
@@ -83,21 +95,54 @@ public class RecommendFragment extends BaseFragment implements  IRecommendTitleC
         super.initPresenter();
         mRecommendTitlePresenter = PresenterManager.getInstance().getRecommendTitlePresenter();
         mRecommendTitlePresenter.registerViewCallback(this);
-        mRecommendTitlePresenter.getUserCollection();
+        mGetCollectionIds = DataUtils.getInstance().getGetCollectionIds();
+        mRecommendTitlePresenter.initUserToken();
+//        mRecommendTitlePresenter.getUserCollection();
     }
+
 
 
     @Override
     protected void loadData() {
         super.loadData();
         //加载数据
-        mRecommendTitlePresenter.getRecommendTitle();
+        mRecommendTitlePresenter.getUserCollection();
+//        mRecommendTitlePresenter.getRecommendTitle();
     }
 
     @Override
     protected void initListener() {
         super.initListener();
+        mRecommendAdapter.setOnRecommendTitleItemClickListener(this);
+        mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
+            @Override
+            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+                super.onLoadMore(refreshLayout);
+                if (mRecommendTitlePresenter != null) {
+                    mRecommendTitlePresenter.loadMore();
+                }
+            }
 
+            @Override
+            public void onRefresh(TwinklingRefreshLayout refreshLayout) {
+                super.onRefresh(refreshLayout);
+                if (mRecommendTitlePresenter != null) {
+                    mRecommendTitlePresenter.getUserCollection();
+                }
+            }
+        });
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        boolean needRefresh = mRecommendTitlePresenter.needRefresh();
+        LogUtils.d(RecommendFragment.this,"str boolean ="+needRefresh);
+        if (needRefresh){
+            loadData();
+        }
+        LogUtils.d(RecommendFragment.this,"onResume");
     }
 
     @Override
@@ -108,14 +153,46 @@ public class RecommendFragment extends BaseFragment implements  IRecommendTitleC
         }
     }
 
+    private boolean isFrist = true;
     @Override
     public void onContentLoadedSuccess(RecommendTitle content) {
         //数据回来
         setupState(State.SUCCESS);
+        LogUtils.d(RecommendFragment.this,"is frist ="+isFrist);
+        if (mRefreshLayout != null&&!isFrist) {
+            ToastUtils.showToast("刷新成功");
+            mRefreshLayout.finishRefreshing();
+        }
+        LogUtils.d(RecommendFragment.this,"onContentLoadedSuccess");
+        isFrist=false;
         //更新ui
-        mRecommendAdapter.setData(content);
-
         mRecommendAdapter.setCollectionData(mGetCollectionIds.getIds());
+        mRecommendAdapter.setData(content);
+    }
+
+    @Override
+    public void onLoaderMoreError() {
+        ToastUtils.showToast("网络异常，请稍后重试");
+        if (mRefreshLayout != null) {
+            mRefreshLayout.finishLoadmore();
+        }
+    }
+
+    @Override
+    public void onLoaderMoreEmpty() {
+        ToastUtils.showToast("没有有更多数据了");
+        if (mRefreshLayout != null) {
+            mRefreshLayout.finishLoadmore();
+        }
+    }
+
+    @Override
+    public void onLoaderMoreLoaded(RecommendTitle data) {
+        mRecommendAdapter.addData(data);
+        if (mRefreshLayout != null) {
+            mRefreshLayout.finishLoadmore();
+        }
+        ToastUtils.showToast("加载了"+data.getData().getDatas().size()+"条数据");
     }
 
     @Override
@@ -150,6 +227,24 @@ public class RecommendFragment extends BaseFragment implements  IRecommendTitleC
 
     @Override
     public void onSendUnCollectionError() {
+
+    }
+
+    @Override
+    public void onItemClick(RecommendTitle.DataBean.DatasBean data) {
+        Intent intent = new Intent(getActivity(), DetailsActivity.class);
+        intent.putExtra(Constants.TITLE,data.getTitle());
+        intent.putExtra(Constants.LINK,data.getLink());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onCollectItemClick(ImageView view, CollectionArticle.DataBean.DatasBean data) {
+
+    }
+
+    @Override
+    public void onUnCollectItemClick(ImageView view, CollectionArticle.DataBean.DatasBean data) {
 
     }
 }

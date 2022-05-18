@@ -6,41 +6,53 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
+import com.program.wanandroiddemo.base.BaseApplication;
 import com.program.wanandroiddemo.model.Api;
 import com.program.wanandroiddemo.model.domain.CollectArticle;
 import com.program.wanandroiddemo.model.domain.CollectionArticle;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
+import com.program.wanandroiddemo.model.domain.UserInfo;
 import com.program.wanandroiddemo.presenter.IRecommendTitlePresenter;
 import com.program.wanandroiddemo.presenter.utils.DataUtils;
 import com.program.wanandroiddemo.presenter.utils.GetCollectionIds;
+import com.program.wanandroiddemo.ui.fragment.UserFragment;
 import com.program.wanandroiddemo.utils.Constants;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.RetrofitManager;
+import com.program.wanandroiddemo.utils.SharedPreferencesUtils;
 import com.program.wanandroiddemo.utils.UrlUitl;
 import com.program.wanandroiddemo.view.IRecommendTitleCallback;
 
 import java.net.HttpURLConnection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.http.Url;
 
 public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
-    private IRecommendTitleCallback mCallback =null;
+    private IRecommendTitleCallback mCallback = null;
     private final Api mApi;
-    private static final int DEFAULT_PAGE=1;
+    private static final int DEFAULT_PAGE = 0;
     private int mCurrentPage = DEFAULT_PAGE;
     private final GetCollectionIds mGetCollectionIds;
+    private SharedPreferencesUtils mSPUtils;
+    private Thread mThread=null;
 
-    private Handler mHandler = new Handler(Looper.myLooper()){
+    private Handler mHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            if (msg.what==Constants.MESSAGE_WHAT_COLLECTION){
-                LogUtils.d(RecommendTitlePresenterImpl.this,"recommend collection ids =="+mGetCollectionIds);
+            if (msg.what == Constants.MESSAGE_WHAT_COLLECTION) {
+                LogUtils.d(RecommendTitlePresenterImpl.this, "recommend collection ids ==" + mGetCollectionIds);
                 getRecommendTitle();
             }
         }
@@ -48,53 +60,90 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
     /**
      * 当前状态
      */
-    private boolean mIsLoading = false;
+    private boolean mIsLoading = true;
+    private final SharedPreferencesUtils mSp;
 
 
     public RecommendTitlePresenterImpl() {
 //        Retrofit retrofit = RetrofitManager.getInstance().getRetrofit();
 //        mApi = retrofit.create(Api.class);
 
-        mApi =RetrofitManager.getInstence().getApi();
+        mApi = RetrofitManager.getInstence().getApi();
         mGetCollectionIds = DataUtils.getInstance().getGetCollectionIds();
+        mSp = SharedPreferencesUtils.getInstance(BaseApplication.getAppContext());
     }
 
     @Override
     public void getRecommendTitle() {
-        if (mIsLoading){
-            return;
-        }
-        mIsLoading = true;
+        mCurrentPage=DEFAULT_PAGE;
         //通知ui
-        if (mCallback != null) {
+        if (mCallback != null&&mIsLoading) {
             mCallback.onLoading();
         }
-
+        mIsLoading=false;
         String recommendTitleUrl = UrlUitl.getRecommendTitle(mCurrentPage);
         Call<RecommendTitle> task = mApi.getRecommend(recommendTitleUrl);
         task.enqueue(new Callback<RecommendTitle>() {
             @Override
             public void onResponse(Call<RecommendTitle> call, Response<RecommendTitle> response) {
                 int code = response.code();
-                LogUtils.d(RecommendTitlePresenterImpl.this,"code-->"+code);
+                LogUtils.d(RecommendTitlePresenterImpl.this, "code-->" + code);
 //                LogUtils.d(RecommendTitlePresenterImpl.this,"result-->"+response.body());
-                if (code== HttpURLConnection.HTTP_OK){
+                if (code == HttpURLConnection.HTTP_OK) {
                     RecommendTitle data = response.body();
                     if (mCallback != null) {
                         onSuccess(data);
                     }
-                }else {
+                } else {
                     onLoadError();
                 }
             }
 
             @Override
             public void onFailure(Call<RecommendTitle> call, Throwable t) {
-                LogUtils.d(RecommendTitlePresenterImpl.this,"error  t-->"+t.getMessage());
+                LogUtils.d(RecommendTitlePresenterImpl.this, "error  t-->" + t.getMessage());
                 onLoadError();
             }
         });
     }
+
+    @Override
+    public void loadMore() {
+        mCurrentPage+=1;
+        String url = UrlUitl.getRecommendTitle(mCurrentPage);
+        Call<RecommendTitle> task = mApi.getRecommend(url);
+        task.enqueue(new Callback<RecommendTitle>() {
+            @Override
+            public void onResponse(Call<RecommendTitle> call, Response<RecommendTitle> response) {
+                int code = response.code();
+                if (code==HttpURLConnection.HTTP_OK){
+                    RecommendTitle data = response.body();
+                    handleLoaderResult(data);
+                }else {
+                    handleLoaderResultError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RecommendTitle> call, Throwable t) {
+                handleLoaderResultError();
+            }
+        });
+    }
+
+    private void handleLoaderResultError() {
+        mCallback.onLoaderMoreError();
+    }
+
+    private void handleLoaderResult(RecommendTitle data) {
+        if (data==null||data.getData().getDatas().size()==0){
+            mCallback.onLoaderMoreEmpty();
+            mCurrentPage--;
+        }else {
+            mCallback.onLoaderMoreLoaded(data);
+        }
+    }
+
 
     private void onLoadError() {
         if (mCallback != null) {
@@ -102,16 +151,16 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
         }
     }
 
-    private void onSuccess(RecommendTitle result){
+    private void onSuccess(RecommendTitle result) {
         if (mCallback != null) {
             try {
-                if (isEmpty(result)){
+                if (isEmpty(result)) {
                     onEmpty();
-                }else {
+                } else {
                     mCallback.onContentLoadedSuccess(result);
-                    LogUtils.d("DEBUG","result");
+                    LogUtils.d("DEBUG", "result");
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 onEmpty();
             }
@@ -131,12 +180,12 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
     @Override
     public void registerViewCallback(IRecommendTitleCallback callback) {
-        this.mCallback =callback;
+        this.mCallback = callback;
     }
 
     @Override
     public void unregisterViewCallback() {
-        this.mCallback =null;
+        this.mCallback = null;
     }
 
 
@@ -144,22 +193,22 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
     public void CollectArticle(int id) {
         String url = UrlUitl.CollectArticle(id);
         String token = Constants.getCookie();
-        Call<CollectArticle> task = mApi.setCollectArticle(url,token);
+        Call<CollectArticle> task = mApi.setCollectArticle(url, token);
         task.enqueue(new Callback<CollectArticle>() {
             @Override
             public void onResponse(Call<CollectArticle> call, Response<CollectArticle> response) {
                 int code = response.code();
                 CollectArticle data = response.body();
-                if (code==HttpURLConnection.HTTP_OK&&data.getErrorCode()==0){
+                if (code == HttpURLConnection.HTTP_OK && data.getErrorCode() == 0) {
                     mCallback.onCollectSuccess();
-                }else {
+                } else {
                     mCallback.onCollectError();
                 }
             }
 
             @Override
             public void onFailure(Call<CollectArticle> call, Throwable t) {
-                    mCallback.onCollectError();
+                mCallback.onCollectError();
             }
         });
     }
@@ -169,86 +218,121 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
     }
 
-    private String cookie = Constants.getCookie();
-    private int page =0;
-    private List<Integer> mUserCollectionIds=null;
     @Override
     public void getUserCollection() {
-        LogUtils.d(RecommendTitlePresenterImpl.this,"recommend collection ids =="+mGetCollectionIds);
-        mUserCollectionIds=new ArrayList<>();
-        if (cookie!=null){
-            String url = UrlUitl.getCollectionList(page);
-            Call<CollectionArticle> task = mApi.getUserCollection(url,cookie);
-            task.enqueue(new Callback<CollectionArticle>() {
+        String token = Constants.getCookie();
+        LogUtils.d(RecommendTitlePresenterImpl.this, "ids =" + mGetCollectionIds + "====cookie" + token.equals(""));
+        if (!token.equals("")) {
+            LogUtils.d(RecommendTitlePresenterImpl.this, "ids =" + mGetCollectionIds + "====cookie" + token);
+            Call<UserInfo> task = mApi.getUserInfo(token);
+            task.enqueue(new Callback<UserInfo>() {
                 @Override
-                public void onResponse(Call<CollectionArticle> call, Response<CollectionArticle> response) {
+                public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
                     int code = response.code();
-                    CollectionArticle data = response.body();
-                    if (code==HttpURLConnection.HTTP_OK&&data.getErrorCode()==0){
-                        for (int i = 0; i < data.getData().getDatas().size(); i++) {
-                            mUserCollectionIds.add(data.getData().getDatas().get(i).getOriginId());
-                        }
-                        mGetCollectionIds.setIds(mUserCollectionIds);
-                        if (data.getData().getPageCount()>1){
-                            page+=1;
-                            LogUtils.d(RecommendTitlePresenterImpl.this,"recommend collection ids =="+mGetCollectionIds+" pageCount ="+data.getData().getPageCount());
-                            getUserCollectionMore(data.getData().getPageCount());
-                        }else {
-                            LogUtils.d(RecommendTitlePresenterImpl.this,"recommend asd="+data.getData().getPageCount());
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Message message = new Message();
-                                    message.what=Constants.MESSAGE_WHAT_COLLECTION;
-                                }
-                            }).start();
-                        }
+                    LogUtils.d(RecommendTitlePresenterImpl.this,"code ="+code);
+                    UserInfo data = response.body();
+                    if (code == HttpURLConnection.HTTP_OK) {
+                        mGetCollectionIds.setIds(data.getData().getUserInfo().getCollectIds());
+                        LogUtils.d(RecommendTitlePresenterImpl.this, "ids =" + mGetCollectionIds);
+                        getRecommendTitle();
+//                        if (mThread == null) {
+//                            LogUtils.d(RecommendTitlePresenterImpl.this,"Thread");
+//                            mThread = new Thread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Message message = new Message();
+//                                    message.what = Constants.MESSAGE_WHAT_COLLECTION;
+//                                }
+//                            });
+//                            mThread.start();
+//                        }
                     }
                 }
 
                 @Override
-                public void onFailure(Call<CollectionArticle> call, Throwable t) {
+                public void onFailure(Call<UserInfo> call, Throwable t) {
 
                 }
             });
+        } else {
+            LogUtils.d(RecommendTitlePresenterImpl.this, " recommend  ");
+            getRecommendTitle();
         }
+
+//        LogUtils.d(RecommendTitlePresenterImpl.this,"recommend collection ids =="+mGetCollectionIds);
+//        mUserCollectionIds=new ArrayList<>();
+//        if (cookie!=null){
+//            String url = UrlUitl.getCollectionList(page);
+//            Call<CollectionArticle> task = mApi.getUserCollection(url,cookie);
+//            task.enqueue(new Callback<CollectionArticle>() {
+//                @Override
+//                public void onResponse(Call<CollectionArticle> call, Response<CollectionArticle> response) {
+//                    int code = response.code();
+//                    CollectionArticle data = response.body();
+//                    if (code==HttpURLConnection.HTTP_OK&&data.getErrorCode()==0){
+//                        for (int i = 0; i < data.getData().getDatas().size(); i++) {
+//                            mUserCollectionIds.add(data.getData().getDatas().get(i).getOriginId());
+//                        }
+//                        mGetCollectionIds.setIds(mUserCollectionIds);
+//                        if (data.getData().getPageCount()>1){
+//                            page+=1;
+//                            LogUtils.d(RecommendTitlePresenterImpl.this,"recommend collection ids =="+mGetCollectionIds+" pageCount ="+data.getData().getPageCount());
+//                            getUserCollectionMore(data.getData().getPageCount());
+//                        }else {
+//                            LogUtils.d(RecommendTitlePresenterImpl.this,"recommend asd="+data.getData().getPageCount());
+//                            new Thread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Message message = new Message();
+//                                    message.what=Constants.MESSAGE_WHAT_COLLECTION;
+//                                }
+//                            }).start();
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<CollectionArticle> call, Throwable t) {
+//
+//                }
+//            });
+//        }
 
 
     }
 
-    private void getUserCollectionMore(int pageCount) {
-        for (; page < pageCount; page++) {
-            String url = UrlUitl.getCollectionList(page);
-            Call<CollectionArticle> task = mApi.getUserCollection(url,cookie);
-            task.enqueue(new Callback<CollectionArticle>() {
-                @Override
-                public void onResponse(Call<CollectionArticle> call, Response<CollectionArticle> response) {
-                    int code = response.code();
-                    CollectionArticle data = response.body();
-                    if (code==HttpURLConnection.HTTP_OK&&data.getErrorCode()==0){
-                        for (int i = 0; i < data.getData().getDatas().size(); i++) {
-                            mUserCollectionIds.add(data.getData().getDatas().get(i).getOriginId());
-                        }
-                        mGetCollectionIds.setIds(mUserCollectionIds);
-                        LogUtils.d(RecommendTitlePresenterImpl.this,"recommend collection ids =="+mGetCollectionIds);
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Message message = new Message();
-                                message.what=Constants.MESSAGE_WHAT_COLLECTION;
-                            }
-                        }).start();
-
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<CollectionArticle> call, Throwable t) {
-
-                }
-            });
+    @Override
+    public void initUserToken() {
+        long timeNow = 0;
+        long time = 0;
+        mSPUtils = SharedPreferencesUtils.getInstance(BaseApplication.getAppContext());
+        DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss", Locale.ENGLISH);
+        try {
+            time = Long.parseLong(mSPUtils.getString(SharedPreferencesUtils.USER_TOKEN_COOKIE_TIME));
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            String s = dateFormat.format(new Date());
+            timeNow = dateFormat.parse(s).getTime();
+            LogUtils.d(RecommendTitlePresenterImpl.this, "timeNow =" + timeNow);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtils.d(RecommendTitlePresenterImpl.this, "time  =" + e.getMessage());
         }
-
-
+        LogUtils.d(RecommendTitlePresenterImpl.this, "time ==" + time + "   timeNow==" + timeNow);
+        if (time <= timeNow) {
+            mSPUtils.clear();
+        }
     }
+
+    @Override
+    public boolean needRefresh() {
+        String str = mSp.getString(SharedPreferencesUtils.NEED_REFRESH);
+        LogUtils.d(RecommendTitlePresenterImpl.this,"str ="+str);
+        if (str==null||str.equals("")){
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+
 }

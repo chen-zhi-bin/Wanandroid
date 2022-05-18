@@ -20,6 +20,7 @@ public class Constants {
 
     public static final int MESSAGE_WHAT_COLLECTION=0;
 
+
     public static final int[] LISTENEDITEM={
             R.id.dialog_collect_article,    //单选--文章
             R.id.dialog_collect_web,        //单选--web

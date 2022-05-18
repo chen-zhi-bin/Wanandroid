@@ -7,12 +7,11 @@ import java.util.List;
 
 public class GetCollectionIds {
 
-    private List<Integer> mIds;
+    private List<Integer> mIds=new ArrayList<>();;
 
     public void setIds(List<Integer> ids) {
-        mIds=new ArrayList<>();
+        mIds.clear();
         this.mIds.addAll(ids);
-        LogUtils.d(GetCollectionIds.this,"ids ="+mIds);
         LogUtils.d(GetCollectionIds.this,"ids ="+ids);
     }
 

@@ -61,4 +61,7 @@ dependencies {
     implementation 'com.dyhdyh.loadingbar2:loadingbar:2.0.1'
 
     implementation'com.ldoublem.loadingview:loadingviewlib:1.0'
+
+    //刷新
+    implementation 'com.lcodecorex:tkrefreshlayout:1.0.7'
 }
