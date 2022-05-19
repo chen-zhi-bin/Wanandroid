@@ -5,17 +5,34 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
-        android:layout_width="match_parent"
+
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
         android:id="@+id/recommend_refresh"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/home_recommend_title"
+        <com.scwang.smart.refresh.header.ClassicsHeader
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
 
-    </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:scrollbars="vertical"
+            android:layout_height="match_parent">
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/home_recommend_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                />
+
+        </androidx.core.widget.NestedScrollView>
+
+        <com.scwang.smart.refresh.footer.ClassicsFooter
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 
 </LinearLayout>

@@ -63,5 +63,8 @@ dependencies {
     implementation'com.ldoublem.loadingview:loadingviewlib:1.0'
 
     //刷新
-    implementation 'com.lcodecorex:tkrefreshlayout:1.0.7'
+//    implementation 'com.lcodecorex:tkrefreshlayout:1.0.7'
+    implementation  'io.github.scwang90:refresh-layout-kernel:2.0.5'      //核心必须依赖
+    implementation  'io.github.scwang90:refresh-header-classics:2.0.5'    //经典刷新头
+    implementation  'io.github.scwang90:refresh-footer-classics:2.0.5'    //经典加载
 }

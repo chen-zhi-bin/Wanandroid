@@ -146,6 +146,8 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
 
     private void onLoadError() {
+
+
         if (mCallback != null) {
             mCallback.onError();
         }
@@ -231,10 +233,10 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
                     int code = response.code();
                     LogUtils.d(RecommendTitlePresenterImpl.this,"code ="+code);
                     UserInfo data = response.body();
-                    if (code == HttpURLConnection.HTTP_OK) {
+                    LogUtils.d(RecommendTitlePresenterImpl.this,"recommend title data ="+data);
+                    if (code == HttpURLConnection.HTTP_OK&&data.getErrorCode()==0) {
                         mGetCollectionIds.setIds(data.getData().getUserInfo().getCollectIds());
                         LogUtils.d(RecommendTitlePresenterImpl.this, "ids =" + mGetCollectionIds);
-                        getRecommendTitle();
 //                        if (mThread == null) {
 //                            LogUtils.d(RecommendTitlePresenterImpl.this,"Thread");
 //                            mThread = new Thread(new Runnable() {
@@ -247,6 +249,7 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 //                            mThread.start();
 //                        }
                     }
+                    getRecommendTitle();
                 }
 
                 @Override
@@ -330,6 +333,7 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
         if (str==null||str.equals("")){
             return false;
         }else {
+            mSp.remove(SharedPreferencesUtils.NEED_REFRESH);
             return true;
         }
     }

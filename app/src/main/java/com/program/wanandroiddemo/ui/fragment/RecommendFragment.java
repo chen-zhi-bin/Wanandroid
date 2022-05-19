@@ -13,8 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
-import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.base.BaseActivity;
 import com.program.wanandroiddemo.base.BaseApplication;
@@ -33,6 +31,10 @@ import com.program.wanandroiddemo.utils.SharedPreferencesUtils;
 import com.program.wanandroiddemo.utils.SizeUtils;
 import com.program.wanandroiddemo.utils.ToastUtils;
 import com.program.wanandroiddemo.view.IRecommendTitleCallback;
+import com.scwang.smart.refresh.layout.SmartRefreshLayout;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
+import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 
 import java.util.List;
 
@@ -47,7 +49,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     public TextView barTitleTv;
 
     @BindView(R.id.recommend_refresh)
-    public TwinklingRefreshLayout mRefreshLayout;
+    public SmartRefreshLayout mRefreshLayout;
+//    public TwinklingRefreshLayout mRefreshLayout;
 
 
     private RecommendAdapter mRecommendAdapter;
@@ -86,8 +89,12 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
                 outRect.right = SizeUtils.dip2px(getContext(), 2.5f);
             }
         });
-        mRefreshLayout.setEnableLoadmore(true);
-        mRefreshLayout.setEnableRefresh(true);
+
+//        mRefreshLayout.setEnableLoadmore(true);
+//        mRefreshLayout.setEnableRefresh(true);
+
+
+
     }
 
     @Override
@@ -97,7 +104,6 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
         mRecommendTitlePresenter.registerViewCallback(this);
         mGetCollectionIds = DataUtils.getInstance().getGetCollectionIds();
         mRecommendTitlePresenter.initUserToken();
-//        mRecommendTitlePresenter.getUserCollection();
     }
 
 
@@ -114,23 +120,39 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     protected void initListener() {
         super.initListener();
         mRecommendAdapter.setOnRecommendTitleItemClickListener(this);
-        mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
+        mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
-            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
-                super.onLoadMore(refreshLayout);
-                if (mRecommendTitlePresenter != null) {
-                    mRecommendTitlePresenter.loadMore();
-                }
-            }
-
-            @Override
-            public void onRefresh(TwinklingRefreshLayout refreshLayout) {
-                super.onRefresh(refreshLayout);
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
                 if (mRecommendTitlePresenter != null) {
                     mRecommendTitlePresenter.getUserCollection();
                 }
             }
         });
+        mRefreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                if (mRecommendTitlePresenter != null) {
+                    mRecommendTitlePresenter.loadMore();
+                }
+            }
+        });
+//        mRefreshLayout.setOnRefreshListener(new RefreshListenerAdapter() {
+//            @Override
+//            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+//                super.onLoadMore(refreshLayout);
+//                if (mRecommendTitlePresenter != null) {
+//                    mRecommendTitlePresenter.loadMore();
+//                }
+//            }
+//
+//            @Override
+//            public void onRefresh(TwinklingRefreshLayout refreshLayout) {
+//                super.onRefresh(refreshLayout);
+//                if (mRecommendTitlePresenter != null) {
+//                    mRecommendTitlePresenter.getUserCollection();
+//                }
+//            }
+//        });
     }
 
 
@@ -141,6 +163,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
         LogUtils.d(RecommendFragment.this,"str boolean ="+needRefresh);
         if (needRefresh){
             loadData();
+
         }
         LogUtils.d(RecommendFragment.this,"onResume");
     }
@@ -161,7 +184,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
         LogUtils.d(RecommendFragment.this,"is frist ="+isFrist);
         if (mRefreshLayout != null&&!isFrist) {
             ToastUtils.showToast("刷新成功");
-            mRefreshLayout.finishRefreshing();
+//            mRefreshLayout.finishRefreshing();
+            mRefreshLayout.finishRefresh();
         }
         LogUtils.d(RecommendFragment.this,"onContentLoadedSuccess");
         isFrist=false;
@@ -174,7 +198,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     public void onLoaderMoreError() {
         ToastUtils.showToast("网络异常，请稍后重试");
         if (mRefreshLayout != null) {
-            mRefreshLayout.finishLoadmore();
+//            mRefreshLayout.finishLoadmore();
+            mRefreshLayout.finishLoadMore();
         }
     }
 
@@ -182,7 +207,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     public void onLoaderMoreEmpty() {
         ToastUtils.showToast("没有有更多数据了");
         if (mRefreshLayout != null) {
-            mRefreshLayout.finishLoadmore();
+//            mRefreshLayout.finishLoadmore();
+            mRefreshLayout.finishLoadMore();
         }
     }
 
@@ -190,7 +216,8 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     public void onLoaderMoreLoaded(RecommendTitle data) {
         mRecommendAdapter.addData(data);
         if (mRefreshLayout != null) {
-            mRefreshLayout.finishLoadmore();
+//            mRefreshLayout.finishLoadmore();
+            mRefreshLayout.finishLoadMore();
         }
         ToastUtils.showToast("加载了"+data.getData().getDatas().size()+"条数据");
     }
