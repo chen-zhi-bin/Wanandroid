@@ -56,6 +56,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     private RecommendAdapter mRecommendAdapter;
     private IRecommendTitlePresenter mRecommendTitlePresenter;
     private GetCollectionIds mGetCollectionIds;
+    private ImageView mView;
 
 
     @Override
@@ -65,7 +66,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
 
     @Override
     protected View loadRootView(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.fragment_with_bar_layout,container,false);
+        return inflater.inflate(R.layout.fragment_with_bar_layout, container, false);
     }
 
     //显示
@@ -94,7 +95,6 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
 //        mRefreshLayout.setEnableRefresh(true);
 
 
-
     }
 
     @Override
@@ -105,7 +105,6 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
         mGetCollectionIds = DataUtils.getInstance().getGetCollectionIds();
         mRecommendTitlePresenter.initUserToken();
     }
-
 
 
     @Override
@@ -160,35 +159,36 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     public void onResume() {
         super.onResume();
         boolean needRefresh = mRecommendTitlePresenter.needRefresh();
-        LogUtils.d(RecommendFragment.this,"str boolean ="+needRefresh);
-        if (needRefresh){
+        LogUtils.d(RecommendFragment.this, "str boolean =" + needRefresh);
+        if (needRefresh) {
             loadData();
 
         }
-        LogUtils.d(RecommendFragment.this,"onResume");
+        LogUtils.d(RecommendFragment.this, "onResume");
     }
 
     @Override
     protected void relese() {
         super.relese();
-        if (mRecommendTitlePresenter!=null){
+        if (mRecommendTitlePresenter != null) {
             mRecommendTitlePresenter.unregisterViewCallback();
         }
     }
 
     private boolean isFrist = true;
+
     @Override
     public void onContentLoadedSuccess(RecommendTitle content) {
         //数据回来
         setupState(State.SUCCESS);
-        LogUtils.d(RecommendFragment.this,"is frist ="+isFrist);
-        if (mRefreshLayout != null&&!isFrist) {
+        LogUtils.d(RecommendFragment.this, "is frist =" + isFrist);
+        if (mRefreshLayout != null && !isFrist) {
             ToastUtils.showToast("刷新成功");
 //            mRefreshLayout.finishRefreshing();
             mRefreshLayout.finishRefresh();
         }
-        LogUtils.d(RecommendFragment.this,"onContentLoadedSuccess");
-        isFrist=false;
+        LogUtils.d(RecommendFragment.this, "onContentLoadedSuccess");
+        isFrist = false;
         //更新ui
         mRecommendAdapter.setCollectionData(mGetCollectionIds.getIds());
         mRecommendAdapter.setData(content);
@@ -219,7 +219,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
 //            mRefreshLayout.finishLoadmore();
             mRefreshLayout.finishLoadMore();
         }
-        ToastUtils.showToast("加载了"+data.getData().getDatas().size()+"条数据");
+        ToastUtils.showToast("加载了" + data.getData().getDatas().size() + "条数据");
     }
 
     @Override
@@ -239,39 +239,63 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
 
     @Override
     public void onCollectSuccess() {
-
+        int tag = Integer.parseInt(mView.getTag()+"");
+        if (tag==R.mipmap.collect_normal){
+            mView.setImageResource(Constants.BULE_LOVE);
+            mView.setTag(Constants.BULE_LOVE);
+            ToastUtils.showToast("收藏成功");
+        }
     }
+
 
     @Override
     public void onCollectError() {
-
+        int tag = Integer.parseInt(mView.getTag()+"");
+        if (tag==R.mipmap.collect_normal){
+            mView.setImageResource(Constants.WHITE_LOVE);
+            mView.setTag(Constants.WHITE_LOVE);
+            ToastUtils.showToast("收藏失败,请检查登录情况");
+        }
     }
 
     @Override
     public void onSendUnCollectionSuccess() {
-
+        int tag = Integer.parseInt(mView.getTag()+"");
+        if (tag==R.mipmap.collect_press){
+            mView.setImageResource(Constants.WHITE_LOVE);
+            mView.setTag(Constants.WHITE_LOVE);
+            ToastUtils.showToast("已取消收藏");
+        }
     }
 
     @Override
     public void onSendUnCollectionError() {
+        int tag = Integer.parseInt(mView.getTag()+"");
+        if (tag==R.mipmap.collect_press){
+            mView.setImageResource(Constants.BULE_LOVE);
+            mView.setTag(Constants.BULE_LOVE);
+            ToastUtils.showToast("网络错误，取消收藏失败");
+        }
 
     }
 
     @Override
     public void onItemClick(RecommendTitle.DataBean.DatasBean data) {
         Intent intent = new Intent(getActivity(), DetailsActivity.class);
-        intent.putExtra(Constants.TITLE,data.getTitle());
-        intent.putExtra(Constants.LINK,data.getLink());
+        intent.putExtra(Constants.TITLE, data.getTitle());
+        intent.putExtra(Constants.LINK, data.getLink());
         startActivity(intent);
     }
 
     @Override
-    public void onCollectItemClick(ImageView view, CollectionArticle.DataBean.DatasBean data) {
-
+    public void onCollectItemClick(ImageView view, RecommendTitle.DataBean.DatasBean data) {
+        mRecommendTitlePresenter.CollectArticle(data.getId());
+        this.mView = view;
     }
 
     @Override
-    public void onUnCollectItemClick(ImageView view, CollectionArticle.DataBean.DatasBean data) {
-
+    public void onUnCollectItemClick(ImageView view, RecommendTitle.DataBean.DatasBean data) {
+        mRecommendTitlePresenter.unCollect(data.getId(),data.getId());
+        this.mView=view;
     }
 }

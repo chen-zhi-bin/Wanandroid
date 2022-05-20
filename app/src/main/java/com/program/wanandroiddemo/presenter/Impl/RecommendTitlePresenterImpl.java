@@ -11,6 +11,7 @@ import com.program.wanandroiddemo.model.Api;
 import com.program.wanandroiddemo.model.domain.CollectArticle;
 import com.program.wanandroiddemo.model.domain.CollectionArticle;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
+import com.program.wanandroiddemo.model.domain.UnCollectArticle;
 import com.program.wanandroiddemo.model.domain.UserInfo;
 import com.program.wanandroiddemo.presenter.IRecommendTitlePresenter;
 import com.program.wanandroiddemo.presenter.utils.DataUtils;
@@ -217,7 +218,38 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
     @Override
     public void unCollect(int id, int originId) {
+        String token = Constants.getCookie();
+        String url = UrlUitl.unCollectUrl(id);
+        Call<UnCollectArticle> task = mApi.unCollectArticle(url, token, originId);
+        task.enqueue(new Callback<UnCollectArticle>() {
+            @Override
+            public void onResponse(Call<UnCollectArticle> call, Response<UnCollectArticle> response) {
+                int code = response.code();
+                UnCollectArticle result = response.body();
+                if (code == HttpURLConnection.HTTP_OK && result.getErrorCode() == 0) {
+                    unCollectSuccess();
+                } else {
+                    unCollectError();
+                }
+            }
 
+            @Override
+            public void onFailure(Call<UnCollectArticle> call, Throwable t) {
+                unCollectError();
+            }
+        });
+    }
+
+    private void unCollectError() {
+        if (mCallback != null) {
+            mCallback.onCollectError();
+        }
+    }
+
+    private void unCollectSuccess() {
+        if (mCallback != null) {
+            mCallback.onCollectSuccess();
+        }
     }
 
     @Override
