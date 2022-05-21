@@ -10,6 +10,7 @@ import com.program.wanandroiddemo.base.BaseApplication;
 import com.program.wanandroiddemo.model.Api;
 import com.program.wanandroiddemo.model.domain.CollectArticle;
 import com.program.wanandroiddemo.model.domain.CollectionArticle;
+import com.program.wanandroiddemo.model.domain.RecommendPagerContent;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
 import com.program.wanandroiddemo.model.domain.UnCollectArticle;
 import com.program.wanandroiddemo.model.domain.UserInfo;
@@ -21,6 +22,7 @@ import com.program.wanandroiddemo.utils.Constants;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.RetrofitManager;
 import com.program.wanandroiddemo.utils.SharedPreferencesUtils;
+import com.program.wanandroiddemo.utils.ToastUtils;
 import com.program.wanandroiddemo.utils.UrlUitl;
 import com.program.wanandroiddemo.view.IRecommendTitleCallback;
 
@@ -347,6 +349,30 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
             mSp.remove(SharedPreferencesUtils.NEED_REFRESH);
             return true;
         }
+    }
+
+    @Override
+    public void getLooperPager() {
+        Call<RecommendPagerContent> task = mApi.getRecommendPagerLoop(Constants.BASE_URL + "banner/json");
+        task.enqueue(new Callback<RecommendPagerContent>() {
+            @Override
+            public void onResponse(Call<RecommendPagerContent> call, Response<RecommendPagerContent> response) {
+                int code = response.code();
+                RecommendPagerContent data = response.body();
+                LogUtils.d(RecommendTitlePresenterImpl.this,"loop data ="+data);
+                if (code==HttpURLConnection.HTTP_OK&&data.getErrorCode()==0){
+
+                    mCallback.onLooperListLoaded(data);
+                }else {
+                    ToastUtils.showToast(data.getErrorMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RecommendPagerContent> call, Throwable t) {
+                ToastUtils.showToast(t.getMessage());
+            }
+        });
     }
 
 

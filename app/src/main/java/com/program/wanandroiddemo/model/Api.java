@@ -6,6 +6,7 @@ import com.program.wanandroiddemo.model.domain.CollectWebsite;
 import com.program.wanandroiddemo.model.domain.CollectionArticle;
 import com.program.wanandroiddemo.model.domain.CollectionWebsite;
 import com.program.wanandroiddemo.model.domain.Loginout;
+import com.program.wanandroiddemo.model.domain.RecommendPagerContent;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
 import com.program.wanandroiddemo.model.domain.UnCollectArticle;
 import com.program.wanandroiddemo.model.domain.UnCollectWeb;
@@ -29,6 +30,12 @@ public interface Api {
      */
     @GET
     Call<RecommendTitle> getRecommend(@Url String url);
+
+    /**
+     * 获取推荐banner
+     */
+    @GET
+    Call<RecommendPagerContent> getRecommendPagerLoop(@Url String url);
 
     /**
      * 登录

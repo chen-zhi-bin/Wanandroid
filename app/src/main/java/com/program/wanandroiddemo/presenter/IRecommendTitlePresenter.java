@@ -16,4 +16,9 @@ public interface IRecommendTitlePresenter extends IArticlePresenter<IRecommendTi
      * 返回时判断是否需要刷新
      */
     boolean needRefresh();
+
+    /*
+    轮播图
+     */
+    void getLooperPager();
 }

@@ -5,25 +5,31 @@ import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.base.BaseActivity;
 import com.program.wanandroiddemo.base.BaseApplication;
 import com.program.wanandroiddemo.base.BaseFragment;
 import com.program.wanandroiddemo.model.domain.CollectionArticle;
+import com.program.wanandroiddemo.model.domain.RecommendPagerContent;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
 import com.program.wanandroiddemo.presenter.IRecommendTitlePresenter;
 import com.program.wanandroiddemo.presenter.utils.DataUtils;
 import com.program.wanandroiddemo.presenter.utils.GetCollectionIds;
 import com.program.wanandroiddemo.ui.activity.DetailsActivity;
+import com.program.wanandroiddemo.ui.adapter.LooperPagerAdapter;
 import com.program.wanandroiddemo.ui.adapter.RecommendAdapter;
+import com.program.wanandroiddemo.ui.custom.AutoLoopViewPager;
 import com.program.wanandroiddemo.utils.Constants;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.PresenterManager;
@@ -36,11 +42,12 @@ import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 
-public class RecommendFragment extends BaseFragment implements IRecommendTitleCallback, RecommendAdapter.OnRecommendTitleItemClickListener {
+public class RecommendFragment extends BaseFragment implements IRecommendTitleCallback, RecommendAdapter.OnRecommendTitleItemClickListener, LooperPagerAdapter.OnLoopPagerItemClickListener {
 
     @BindView(R.id.home_recommend_title)
     public RecyclerView mContentRv;
@@ -50,8 +57,13 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
 
     @BindView(R.id.recommend_refresh)
     public SmartRefreshLayout mRefreshLayout;
-//    public TwinklingRefreshLayout mRefreshLayout;
 
+    @BindView(R.id.loop_pager)
+    public AutoLoopViewPager looperPager;
+    private LooperPagerAdapter mLooperPagerAdapter;
+
+    @BindView(R.id.looper_point_container)
+    public LinearLayout looperPointContainer;
 
     private RecommendAdapter mRecommendAdapter;
     private IRecommendTitlePresenter mRecommendTitlePresenter;
@@ -91,6 +103,12 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
             }
         });
 
+        //轮播图
+        //创建适配器
+        mLooperPagerAdapter = new LooperPagerAdapter();
+        //设置适配器
+        looperPager.setAdapter(mLooperPagerAdapter);
+
 //        mRefreshLayout.setEnableLoadmore(true);
 //        mRefreshLayout.setEnableRefresh(true);
 
@@ -112,12 +130,37 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
         super.loadData();
         //加载数据
         mRecommendTitlePresenter.getUserCollection();
+        mRecommendTitlePresenter.getLooperPager();
 //        mRecommendTitlePresenter.getRecommendTitle();
     }
 
     @Override
     protected void initListener() {
         super.initListener();
+        mLooperPagerAdapter.setOnLoopPagerItemClickListener(this);
+        looperPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                //滑动
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                //切换指示器
+                //因为postion会越滑越大,所以要求余
+                if (mLooperPagerAdapter.getDataSize()==0) {
+                    return;
+                }
+                int targetPosition = position % mLooperPagerAdapter.getDataSize();
+                updateLooperIndicator(targetPosition);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                //状态改变
+            }
+        });
+
         mRecommendAdapter.setOnRecommendTitleItemClickListener(this);
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
@@ -155,6 +198,23 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     }
 
 
+    /**
+     * 切换指示器
+     *
+     * @param targetPosition
+     */
+    private void updateLooperIndicator(int targetPosition) {
+        for (int i = 0; i < looperPointContainer.getChildCount(); i++) {
+            View point = looperPointContainer.getChildAt(i);
+            if (i == targetPosition) {
+                point.setBackgroundResource(R.drawable.shape_indicator_point_selected);
+            } else {
+                point.setBackgroundResource(R.drawable.shape_indicator_point_noraml);
+            }
+        }
+
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -164,7 +224,18 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
             loadData();
 
         }
+
+        //开始轮播
+        looperPager.startLoop();
+
         LogUtils.d(RecommendFragment.this, "onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //关闭轮播
+        looperPager.stopLoop();
     }
 
     @Override
@@ -220,6 +291,42 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
             mRefreshLayout.finishLoadMore();
         }
         ToastUtils.showToast("加载了" + data.getData().getDatas().size() + "条数据");
+    }
+
+    @Override
+    public void onLooperListLoaded(RecommendPagerContent contents) {
+        List<RecommendPagerContent.DataBean> dataBeanList = new ArrayList<>();
+        for (int i = 0; i < contents.getData().size(); i++) {
+            dataBeanList.add(contents.getData().get(i));
+        }
+        mLooperPagerAdapter.setData(dataBeanList);
+
+        //设置到中间点
+        //中间点%的数据不一定为0，所以显示的就不是第一个
+        int dx = (Integer.MAX_VALUE / 2) % contents.getData().size();
+        int targetCenterPostion = (Integer.MAX_VALUE / 2) - dx;
+        looperPager.setCurrentItem(targetCenterPostion);
+        LogUtils.d(this, "url-->" + contents.getData().get(0));
+
+
+        //添加点
+        for (int i = 0; i < contents.getData().size(); i++) {
+            View point = new View(getContext());
+            //view会加到LinearLayout钟
+            int size = SizeUtils.dip2px(getContext(), 8);
+            //设置大小
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(size, size);
+            point.setLayoutParams(layoutParams);
+            point.setBackgroundColor(getContext().getColor(R.color.white));
+            layoutParams.leftMargin = SizeUtils.dip2px(getContext(), 5);
+            layoutParams.rightMargin = SizeUtils.dip2px(getContext(), 5);
+            if (i == 0) {
+                point.setBackgroundResource(R.drawable.shape_indicator_point_selected);
+            } else {
+                point.setBackgroundResource(R.drawable.shape_indicator_point_noraml);
+            }
+            looperPointContainer.addView(point);
+        }
     }
 
     @Override
@@ -296,5 +403,14 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     public void onUnCollectItemClick(ImageView view, RecommendTitle.DataBean.DatasBean data) {
         mRecommendTitlePresenter.unCollect(data.getId(),data.getId());
         this.mView=view;
+    }
+
+    @Override
+    public void onLoopereItemClick(RecommendPagerContent.DataBean item) {
+        LogUtils.d(this,"点击了轮播图："+item.getTitle());
+        Intent intent = new Intent(BaseApplication.getAppContext(), DetailsActivity.class);
+        intent.putExtra(Constants.LINK,item.getUrl());
+        intent.putExtra(Constants.TITLE,item.getTitle());
+        startActivity(intent);
     }
 }

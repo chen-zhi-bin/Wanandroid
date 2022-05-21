@@ -2,6 +2,7 @@ package com.program.wanandroiddemo.view;
 
 import com.program.wanandroiddemo.base.IArticleCallback;
 import com.program.wanandroiddemo.base.IBaseCallback;
+import com.program.wanandroiddemo.model.domain.RecommendPagerContent;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
 
 import java.util.List;
@@ -29,5 +30,9 @@ public interface IRecommendTitleCallback extends IArticleCallback {
      */
     void onLoaderMoreLoaded(RecommendTitle data);
 
-
+    /**
+     * 轮播图内容加载
+     * @param contents
+     */
+    void onLooperListLoaded(RecommendPagerContent contents);
 }
