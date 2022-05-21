@@ -19,11 +19,13 @@ import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.base.BaseActivity;
 import com.program.wanandroiddemo.base.BaseApplication;
 import com.program.wanandroiddemo.base.BaseFragment;
+import com.program.wanandroiddemo.presenter.IMainActivityDataHandle;
 import com.program.wanandroiddemo.ui.fragment.RecommendFragment;
 import com.program.wanandroiddemo.ui.fragment.SystemFragment;
 import com.program.wanandroiddemo.ui.fragment.UserFragment;
 import com.program.wanandroiddemo.utils.Constants;
 import com.program.wanandroiddemo.utils.LogUtils;
+import com.program.wanandroiddemo.utils.PresenterManager;
 import com.program.wanandroiddemo.utils.SharedPreferencesUtils;
 
 import butterknife.BindView;
@@ -37,11 +39,11 @@ public class MainActivity extends BaseActivity {
     private RecommendFragment mRecommendFragment;
     private SystemFragment mSystemFragment;
     private UserFragment mUserFragment;
+    private IMainActivityDataHandle mMainActivityDataHandle;
 
 
     @Override
     protected void initPresenter() {
-
     }
 
     @Override
@@ -51,7 +53,13 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        initBaseData();
         initFragments();
+    }
+
+    private void initBaseData() {
+        mMainActivityDataHandle = PresenterManager.getInstance().getMainActivityDataHandle();
+        mMainActivityDataHandle.initToken();
     }
 
 

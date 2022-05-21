@@ -93,6 +93,7 @@ public class DetailsActivity extends BaseActivity  {
                 mWebLoadingTv.setText(newProgress+"%");
             }
         });
+
         mWeb.setWebViewClient(new WebViewClient(){
             @Override
             public void onPageFinished(WebView view, String url) {

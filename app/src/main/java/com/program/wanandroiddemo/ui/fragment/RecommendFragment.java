@@ -103,7 +103,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
         mRecommendTitlePresenter = PresenterManager.getInstance().getRecommendTitlePresenter();
         mRecommendTitlePresenter.registerViewCallback(this);
         mGetCollectionIds = DataUtils.getInstance().getGetCollectionIds();
-        mRecommendTitlePresenter.initUserToken();
+
     }
 
 
@@ -246,7 +246,6 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
             ToastUtils.showToast("收藏成功");
         }
     }
-
 
     @Override
     public void onCollectError() {

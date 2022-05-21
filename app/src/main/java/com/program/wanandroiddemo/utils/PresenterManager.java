@@ -1,12 +1,14 @@
 package com.program.wanandroiddemo.utils;
 
 import com.program.wanandroiddemo.presenter.ICollectPresenter;
+import com.program.wanandroiddemo.presenter.IMainActivityDataHandle;
 import com.program.wanandroiddemo.presenter.IUserCollectionArticlePresenter;
 import com.program.wanandroiddemo.presenter.IUserCollectionWebPresentere;
 import com.program.wanandroiddemo.presenter.IUserLoginPresenter;
 import com.program.wanandroiddemo.presenter.IRecommendTitlePresenter;
 import com.program.wanandroiddemo.presenter.IUserPresenter;
 import com.program.wanandroiddemo.presenter.Impl.CollectPresenterlmpl;
+import com.program.wanandroiddemo.presenter.Impl.MainActivityDataHandleImpl;
 import com.program.wanandroiddemo.presenter.Impl.UserCollectionArticlePresenterImpl;
 import com.program.wanandroiddemo.presenter.Impl.UserCollectionWebImpl;
 import com.program.wanandroiddemo.presenter.Impl.UserInfoPresenterImpl;
@@ -21,6 +23,7 @@ public class PresenterManager {
     private final IUserCollectionArticlePresenter mUserCollectionPresenter;
     private final IUserCollectionWebPresentere mUserCollectionWeb;
     private final ICollectPresenter mCollectPresenterlmpl;
+    private final IMainActivityDataHandle mMainActivityDataHandle;
 
 
     public static PresenterManager getInstance(){
@@ -53,6 +56,10 @@ public class PresenterManager {
         return mCollectPresenterlmpl;
     }
 
+    public IMainActivityDataHandle getMainActivityDataHandle() {
+        return mMainActivityDataHandle;
+    }
+
     private PresenterManager(){
         mRecommendTitlePresenter = new RecommendTitlePresenterImpl();
         mLoginPresenter = new UserLoginPresenterImpl();
@@ -60,6 +67,7 @@ public class PresenterManager {
         mUserCollectionPresenter = new UserCollectionArticlePresenterImpl();
         mUserCollectionWeb = new UserCollectionWebImpl();
         mCollectPresenterlmpl = new CollectPresenterlmpl();
+        mMainActivityDataHandle = new MainActivityDataHandleImpl();
     }
 
 }

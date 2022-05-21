@@ -13,11 +13,6 @@ public interface IRecommendTitlePresenter extends IArticlePresenter<IRecommendTi
     void getUserCollection();
 
     /**
-     * 判断token是否过期
-     */
-    void initUserToken();
-
-    /**
      * 返回时判断是否需要刷新
      */
     boolean needRefresh();

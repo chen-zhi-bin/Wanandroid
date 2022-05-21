@@ -336,27 +336,6 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
     }
 
-    @Override
-    public void initUserToken() {
-        long timeNow = 0;
-        long time = 0;
-        mSPUtils = SharedPreferencesUtils.getInstance(BaseApplication.getAppContext());
-        DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss", Locale.ENGLISH);
-        try {
-            time = Long.parseLong(mSPUtils.getString(SharedPreferencesUtils.USER_TOKEN_COOKIE_TIME));
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-            String s = dateFormat.format(new Date());
-            timeNow = dateFormat.parse(s).getTime();
-            LogUtils.d(RecommendTitlePresenterImpl.this, "timeNow =" + timeNow);
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogUtils.d(RecommendTitlePresenterImpl.this, "time  =" + e.getMessage());
-        }
-        LogUtils.d(RecommendTitlePresenterImpl.this, "time ==" + time + "   timeNow==" + timeNow);
-        if (time <= timeNow) {
-            mSPUtils.clear();
-        }
-    }
 
     @Override
     public boolean needRefresh() {
