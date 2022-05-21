@@ -125,12 +125,16 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     }
 
 
+    private boolean initLooper = true;
     @Override
     protected void loadData() {
         super.loadData();
         //加载数据
         mRecommendTitlePresenter.getUserCollection();
-        mRecommendTitlePresenter.getLooperPager();
+        if (initLooper){
+            mRecommendTitlePresenter.getLooperPager();
+            initLooper=false;
+        }
 //        mRecommendTitlePresenter.getRecommendTitle();
     }
 
