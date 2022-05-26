@@ -129,12 +129,13 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     @Override
     protected void loadData() {
         super.loadData();
+        setupState(State.LOADING);
         //加载数据
-        mRecommendTitlePresenter.getUserCollection();
         if (initLooper){
             mRecommendTitlePresenter.getLooperPager();
             initLooper=false;
         }
+        mRecommendTitlePresenter.getUserCollection();
 //        mRecommendTitlePresenter.getRecommendTitle();
     }
 
@@ -303,6 +304,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
         for (int i = 0; i < contents.getData().size(); i++) {
             dataBeanList.add(contents.getData().get(i));
         }
+        LogUtils.d(RecommendFragment.this,"sizesssssssss"+dataBeanList.size());
         mLooperPagerAdapter.setData(dataBeanList);
 
         //设置到中间点

@@ -353,16 +353,19 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
     @Override
     public void getLooperPager() {
+        LogUtils.d(RecommendTitlePresenterImpl.this,"getLooperPager");
         Call<RecommendPagerContent> task = mApi.getRecommendPagerLoop(Constants.BASE_URL + "banner/json");
         task.enqueue(new Callback<RecommendPagerContent>() {
             @Override
             public void onResponse(Call<RecommendPagerContent> call, Response<RecommendPagerContent> response) {
                 int code = response.code();
                 RecommendPagerContent data = response.body();
+                LogUtils.d(RecommendTitlePresenterImpl.this,"getLooperPager code-->"+code);
                 LogUtils.d(RecommendTitlePresenterImpl.this,"loop data ="+data);
                 if (code==HttpURLConnection.HTTP_OK&&data.getErrorCode()==0){
-
-                    mCallback.onLooperListLoaded(data);
+                    if (mCallback != null) {
+                        mCallback.onLooperListLoaded(data);
+                    }
                 }else {
                     ToastUtils.showToast(data.getErrorMsg());
                 }

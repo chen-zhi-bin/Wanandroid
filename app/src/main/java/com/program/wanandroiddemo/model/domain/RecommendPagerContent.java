@@ -83,6 +83,20 @@ public class RecommendPagerContent implements Serializable {
         @SerializedName("url")
         private String url;
 
+        public DataBean() {
+        }
+
+        public DataBean(String desc, Integer id, String imagePath, Integer isVisible, Integer order, String title, Integer type, String url) {
+            this.desc = desc;
+            this.id = id;
+            this.imagePath = imagePath;
+            this.isVisible = isVisible;
+            this.order = order;
+            this.title = title;
+            this.type = type;
+            this.url = url;
+        }
+
         public String getDesc() {
             return desc;
         }

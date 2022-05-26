@@ -9,6 +9,7 @@ import androidx.viewpager.widget.PagerAdapter;
 
 import com.bumptech.glide.Glide;
 import com.program.wanandroiddemo.model.domain.RecommendPagerContent;
+import com.program.wanandroiddemo.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
