@@ -18,7 +18,7 @@ public class Constants {
     public static final int DIALOG_CHOICE_ARTICLE=1;
     public static final int DIALOG_CHOICE_WEB=2;
 
-    public static final int MESSAGE_WHAT_COLLECTION=0;
+    public static final int MESSAGE_WHAT_COLLECTION=0;      //请求用户收藏
 
 
     public static final int[] LISTENEDITEM={

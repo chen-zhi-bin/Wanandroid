@@ -91,7 +91,6 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
             public void onResponse(Call<RecommendTitle> call, Response<RecommendTitle> response) {
                 int code = response.code();
                 LogUtils.d(RecommendTitlePresenterImpl.this, "code-->" + code);
-//                LogUtils.d(RecommendTitlePresenterImpl.this,"result-->"+response.body());
                 if (code == HttpURLConnection.HTTP_OK) {
                     RecommendTitle data = response.body();
                     if (mCallback != null) {
@@ -244,13 +243,13 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
     private void unCollectError() {
         if (mCallback != null) {
-            mCallback.onCollectError();
+            mCallback.onSendUnCollectionError();
         }
     }
 
     private void unCollectSuccess() {
         if (mCallback != null) {
-            mCallback.onCollectSuccess();
+            mCallback.onSendUnCollectionSuccess();
         }
     }
 
@@ -258,7 +257,7 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
     public void getUserCollection() {
         String token = Constants.getCookie();
         LogUtils.d(RecommendTitlePresenterImpl.this, "ids =" + mGetCollectionIds + "====cookie" + token.equals(""));
-        if (!token.equals("")) {
+//        if (!token.equals("")) {
             LogUtils.d(RecommendTitlePresenterImpl.this, "ids =" + mGetCollectionIds + "====cookie" + token);
             Call<UserInfo> task = mApi.getUserInfo(token);
             task.enqueue(new Callback<UserInfo>() {
@@ -271,19 +270,26 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
                     if (code == HttpURLConnection.HTTP_OK&&data.getErrorCode()==0) {
                         mGetCollectionIds.setIds(data.getData().getUserInfo().getCollectIds());
                         LogUtils.d(RecommendTitlePresenterImpl.this, "ids =" + mGetCollectionIds);
-//                        if (mThread == null) {
-//                            LogUtils.d(RecommendTitlePresenterImpl.this,"Thread");
-//                            mThread = new Thread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    Message message = new Message();
-//                                    message.what = Constants.MESSAGE_WHAT_COLLECTION;
-//                                }
-//                            });
-//                            mThread.start();
-//                        }
+
                     }
-                    getRecommendTitle();
+                    if (data.getErrorCode()==-1001){
+                        mSPUtils=SharedPreferencesUtils.getInstance(BaseApplication.getAppContext());
+                        mSPUtils.clear();
+                        ArrayList<Integer> nullData = new ArrayList<>();
+                        mGetCollectionIds.setIds(nullData);
+                    }
+                    LogUtils.d(RecommendTitlePresenterImpl.this,"mThread ="+mThread);
+                        mThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LogUtils.d(RecommendTitlePresenterImpl.this,"mThread ="+mThread);
+                                Message message = new Message();
+                                message.what = Constants.MESSAGE_WHAT_COLLECTION;
+                                mHandler.sendMessage(message);
+                            }
+                        });
+                        mThread.start();
+//                    getRecommendTitle();
                 }
 
                 @Override
@@ -291,48 +297,9 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
                 }
             });
-        } else {
-            LogUtils.d(RecommendTitlePresenterImpl.this, " recommend  ");
-            getRecommendTitle();
-        }
-
-//        LogUtils.d(RecommendTitlePresenterImpl.this,"recommend collection ids =="+mGetCollectionIds);
-//        mUserCollectionIds=new ArrayList<>();
-//        if (cookie!=null){
-//            String url = UrlUitl.getCollectionList(page);
-//            Call<CollectionArticle> task = mApi.getUserCollection(url,cookie);
-//            task.enqueue(new Callback<CollectionArticle>() {
-//                @Override
-//                public void onResponse(Call<CollectionArticle> call, Response<CollectionArticle> response) {
-//                    int code = response.code();
-//                    CollectionArticle data = response.body();
-//                    if (code==HttpURLConnection.HTTP_OK&&data.getErrorCode()==0){
-//                        for (int i = 0; i < data.getData().getDatas().size(); i++) {
-//                            mUserCollectionIds.add(data.getData().getDatas().get(i).getOriginId());
-//                        }
-//                        mGetCollectionIds.setIds(mUserCollectionIds);
-//                        if (data.getData().getPageCount()>1){
-//                            page+=1;
-//                            LogUtils.d(RecommendTitlePresenterImpl.this,"recommend collection ids =="+mGetCollectionIds+" pageCount ="+data.getData().getPageCount());
-//                            getUserCollectionMore(data.getData().getPageCount());
-//                        }else {
-//                            LogUtils.d(RecommendTitlePresenterImpl.this,"recommend asd="+data.getData().getPageCount());
-//                            new Thread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    Message message = new Message();
-//                                    message.what=Constants.MESSAGE_WHAT_COLLECTION;
-//                                }
-//                            }).start();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Call<CollectionArticle> call, Throwable t) {
-//
-//                }
-//            });
+//        } else {
+//            LogUtils.d(RecommendTitlePresenterImpl.this, " recommend  ");
+//            getRecommendTitle();
 //        }
 
 

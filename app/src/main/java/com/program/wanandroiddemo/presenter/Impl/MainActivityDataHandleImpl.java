@@ -36,6 +36,8 @@ public class MainActivityDataHandleImpl implements IMainActivityDataHandle {
             LogUtils.d(MainActivityDataHandleImpl.this, "time  =" + e.getMessage());
         }
         LogUtils.d(MainActivityDataHandleImpl.this, "time ==" + time + "   timeNow==" + timeNow);
+        LogUtils.d(MainActivityDataHandleImpl.this, "time x==" +(time<timeNow));
+        LogUtils.d(MainActivityDataHandleImpl.this, "time x==" +(time<timeNow));
         if (time <= timeNow) {
             mSPUtils.clear();
         }

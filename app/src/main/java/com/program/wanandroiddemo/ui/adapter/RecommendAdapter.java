@@ -99,7 +99,7 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
 
     public void setCollectionData(List<Integer> ids){
        if (ids!=null){
-           if (ids.size()>0){
+           if (ids.size()>=0){
                this.mCollectionIds.clear();
                this.mCollectionIds.addAll(ids);
                notifyDataSetChanged();
@@ -145,12 +145,13 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
             long t = datasBean.getPublishTime();
             time.setText(longTime2String(t));
             int collection = SearchUtil.Search(mCollectionIds, datasBean.getId());
-            if (collection!=-1){
-                mLoveIv.setImageResource(R.mipmap.collect_press);
-                mLoveIv.setTag(R.mipmap.collect_press);
-            }else {
-                mLoveIv.setTag(R.mipmap.collect_normal);
-            }
+            LogUtils.d(RecommendAdapter.this,"size"+mCollectionIds.size());
+                if (collection!=-1){
+                    mLoveIv.setImageResource(R.mipmap.collect_press);
+                    mLoveIv.setTag(R.mipmap.collect_press);
+                }else {
+                    mLoveIv.setTag(R.mipmap.collect_normal);
+                }
 
 //            LogUtils.d(RecommendAdapter.this,"作者："+datasBean.getAuthor()+"分享人:"+datasBean.getShareUser());
 //            LogUtils.d("DEBUG","datasBean.getTitlte="+datasBean.getTitle());

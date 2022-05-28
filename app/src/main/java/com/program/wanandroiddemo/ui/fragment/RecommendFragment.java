@@ -96,10 +96,10 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
             @Override
             public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
                 super.getItemOffsets(outRect, view, parent, state);
-                outRect.top = SizeUtils.dip2px(getContext(), 2.5f);
-                outRect.bottom = SizeUtils.dip2px(getContext(), 2.5f);
-                outRect.left = SizeUtils.dip2px(getContext(), 2.5f);
-                outRect.right = SizeUtils.dip2px(getContext(), 2.5f);
+                outRect.top = SizeUtils.dip2px(getContext(), 2f);
+                outRect.bottom = SizeUtils.dip2px(getContext(), 2f);
+                outRect.left = SizeUtils.dip2px(getContext(), 2f);
+                outRect.right = SizeUtils.dip2px(getContext(), 2f);
             }
         });
 
@@ -135,6 +135,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
             mRecommendTitlePresenter.getLooperPager();
             initLooper=false;
         }
+        mRecommendAdapter.setCollectionData(new GetCollectionIds().getIds());
         mRecommendTitlePresenter.getUserCollection();
 //        mRecommendTitlePresenter.getRecommendTitle();
     }
@@ -224,10 +225,9 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
     public void onResume() {
         super.onResume();
         boolean needRefresh = mRecommendTitlePresenter.needRefresh();
-        LogUtils.d(RecommendFragment.this, "str boolean =" + needRefresh);
+        LogUtils.d(RecommendFragment.this, "onResume str boolean =" + needRefresh);
         if (needRefresh) {
             loadData();
-
         }
 
         //开始轮播
@@ -304,7 +304,6 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
         for (int i = 0; i < contents.getData().size(); i++) {
             dataBeanList.add(contents.getData().get(i));
         }
-        LogUtils.d(RecommendFragment.this,"sizesssssssss"+dataBeanList.size());
         mLooperPagerAdapter.setData(dataBeanList);
 
         //设置到中间点
@@ -388,7 +387,6 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
             mView.setTag(Constants.BULE_LOVE);
             ToastUtils.showToast("网络错误，取消收藏失败");
         }
-
     }
 
     @Override
@@ -413,7 +411,6 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
 
     @Override
     public void onLoopereItemClick(RecommendPagerContent.DataBean item) {
-        LogUtils.d(this,"点击了轮播图："+item.getTitle());
         Intent intent = new Intent(BaseApplication.getAppContext(), DetailsActivity.class);
         intent.putExtra(Constants.LINK,item.getUrl());
         intent.putExtra(Constants.TITLE,item.getTitle());

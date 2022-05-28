@@ -9,6 +9,7 @@ import com.program.wanandroiddemo.model.Api;
 import com.program.wanandroiddemo.model.domain.Loginout;
 import com.program.wanandroiddemo.model.domain.UserInfo;
 import com.program.wanandroiddemo.presenter.IUserPresenter;
+import com.program.wanandroiddemo.presenter.utils.GetCollectionIds;
 import com.program.wanandroiddemo.ui.custom.LoadingDialog;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.RetrofitManager;
@@ -47,9 +48,13 @@ public class UserInfoPresenterImpl implements IUserPresenter {
                 int code = response.code();
                 LogUtils.d(this, "code ==" + code);
                 LogUtils.d(this, "result ==" + response.body());
-                if (code == HttpURLConnection.HTTP_OK && response.body().getErrorCode() != -1) {
-                    mSPUtils.clear();
+                if (code == HttpURLConnection.HTTP_OK && response.body().getErrorCode() != -1001) {
+                    mSPUtils.putString(SharedPreferencesUtils.NEED_REFRESH,SharedPreferencesUtils.NEED_REFRESH);
+                    mSPUtils.remove(SharedPreferencesUtils.USER_TOKEN_COOKIE_TIME);
+                    mSPUtils.remove(SharedPreferencesUtils.USER_TOKEN_COOKIE);
+                    mSPUtils.remove(SharedPreferencesUtils.USER_NAME);
                     mCallback.onResultLoginOut();
+                    new GetCollectionIds().setIds2Null();
                 }else {
                     mCallback.onError();
                 }

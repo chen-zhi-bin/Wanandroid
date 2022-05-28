@@ -19,6 +19,11 @@ public class GetCollectionIds {
         return mIds;
     }
 
+    public void setIds2Null(){
+        mIds.clear();
+        LogUtils.d(GetCollectionIds.this,"mids size ="+mIds.size());
+    }
+
     @Override
     public String toString() {
         return "GetCollectionIds{" +
