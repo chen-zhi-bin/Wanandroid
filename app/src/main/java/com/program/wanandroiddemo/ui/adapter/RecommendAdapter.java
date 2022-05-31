@@ -145,7 +145,6 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
             long t = datasBean.getPublishTime();
             time.setText(longTime2String(t));
             int collection = SearchUtil.Search(mCollectionIds, datasBean.getId());
-            LogUtils.d(RecommendAdapter.this,"size"+mCollectionIds.size());
                 if (collection!=-1){
                     mLoveIv.setImageResource(R.mipmap.collect_press);
                     mLoveIv.setTag(R.mipmap.collect_press);

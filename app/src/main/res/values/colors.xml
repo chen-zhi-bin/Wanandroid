@@ -13,4 +13,7 @@
     <color name="colorBtn">#0657fd</color>
     <color name="color_navigation">#8386a1</color>
     <color name="color_grey">#c8d5d8</color>
+
+    <color name="text_grey">#888585</color>
+    <color name="text_grey_press">#99888585</color>
 </resources>
