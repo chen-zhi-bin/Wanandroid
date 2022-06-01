@@ -74,7 +74,7 @@ public class UserCollectActivity extends BaseActivity implements CollectDialog.O
         mDialog = new CollectDialog(UserCollectActivity.this);
         Window dialogWindow = mDialog.getWindow();
         WindowManager.LayoutParams attributes = dialogWindow.getAttributes();
-        attributes.alpha=0.8f;
+        attributes.alpha=1f;
         attributes.dimAmount=0.5f;      //不透明度
         dialogWindow.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         dialogWindow.setAttributes(attributes);
