@@ -4,6 +4,8 @@ package com.program.wanandroiddemo.ui.activity.user;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,7 +34,8 @@ public class UserLoginActivity extends BaseActivity implements ILoginCallback {
     @BindView(R.id.user_login_btn)
     public TextView mLoginBtn;
     private Context mContext;
-
+    private boolean isNameOk = false;
+    private boolean isPswOk = false;
 
     @Override
     protected void initPresenter() {
@@ -56,6 +59,49 @@ public class UserLoginActivity extends BaseActivity implements ILoginCallback {
     protected void initEvent() {
         super.initEvent();
         initListener();
+        mName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                isNameOk=s.length()>0;
+                upState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        mPsw.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                isPswOk=s.length()>0;
+                upState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                isPswOk=s.length()==0;
+            }
+        });
+    }
+
+    private void upState() {
+        if (isNameOk&&isPswOk){
+            mLoginBtn.setBackgroundColor(getResources().getColor(R.color.teal_200));
+        }else {
+            mLoginBtn.setBackgroundColor(getResources().getColor(R.color.white));
+        }
     }
 
     private void initListener() {
