@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.model.domain.CollectionArticle;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
-import com.program.wanandroiddemo.presenter.utils.GetCollectionIds;
+import com.program.wanandroiddemo.model.domain.SystemArticleList;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.SearchUtil;
 
@@ -25,11 +25,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.InnerHolder> {
-
-    private List<RecommendTitle.DataBean.DatasBean> mData=new ArrayList<>();
-    private OnRecommendTitleItemClickListener mContentItemClickListener=null;
+public class SystemDetailsAdapter extends RecyclerView.Adapter<SystemDetailsAdapter.InnerHolder> {
+    
+    private List<SystemArticleList.DataBean.DatasBean> mData = new ArrayList<>();
     private List<Integer> mCollectionIds = new ArrayList<>();
+    private OnTitleItemClickListener mContentItemClickListener = null;
 
     @NonNull
     @Override
@@ -40,11 +40,8 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
 
     @Override
     public void onBindViewHolder(@NonNull InnerHolder holder, int position) {
-    //绑定数据
-        RecommendTitle.DataBean.DatasBean datasBean = mData.get(position);
-        LogUtils.d("DEBUG","holdder setData=="+datasBean);
+        SystemArticleList.DataBean.DatasBean datasBean = mData.get(position);
         holder.setData(datasBean);
-
         holder.mLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,11 +68,20 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
                 }
             }
         });
-
     }
 
     private boolean isCollection(int tag) {
         return tag==R.mipmap.collect_press;
+    }
+
+    public void setCollectionData(List<Integer> ids){
+        if (ids!=null){
+            if (ids.size()>=0){
+                this.mCollectionIds.clear();
+                this.mCollectionIds.addAll(ids);
+                notifyDataSetChanged();
+            }
+        }
     }
 
     @Override
@@ -83,29 +89,18 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
         return mData.size();
     }
 
-    public void setData(RecommendTitle content) {
+    public void setData(List<SystemArticleList.DataBean.DatasBean> datas) {
         this.mData.clear();
-        this.mData.addAll(content.getData().getDatas());
-        LogUtils.d("DEBUG","Recommend setData=="+mData);
-
+        this.mData.addAll(datas);
         notifyDataSetChanged();
     }
 
-    public void addData(RecommendTitle data){
+    public void addData(SystemArticleList data) {
         int olderSize = mData.size();
         mData.addAll(data.getData().getDatas());
         notifyItemChanged(olderSize,data.getData().getDatas().size());
     }
 
-    public void setCollectionData(List<Integer> ids){
-       if (ids!=null){
-           if (ids.size()>=0){
-               this.mCollectionIds.clear();
-               this.mCollectionIds.addAll(ids);
-               notifyDataSetChanged();
-           }
-       }
-    }
 
     public class InnerHolder extends RecyclerView.ViewHolder {
 
@@ -118,7 +113,7 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
         public LinearLayout mLoveLayout;
 
         @BindView(R.id.article_title)
-        public TextView RecommendTitleTv;
+        public TextView mTitleTv;
 
         @BindView(R.id.author_or_shareuser)
         public TextView author;
@@ -137,52 +132,46 @@ public class RecommendAdapter extends RecyclerView.Adapter<RecommendAdapter.Inne
             ButterKnife.bind(this,itemView);
         }
 
-        public void setData(RecommendTitle.DataBean.DatasBean datasBean) {
-            LogUtils.d(RecommendAdapter.this,"dataBean="+datasBean);
-            RecommendTitleTv.setText(datasBean.getTitle());
+        public void setData(SystemArticleList.DataBean.DatasBean datasBean) {
+            mTitleTv.setText(datasBean.getTitle());
             author.setText(datasBean.getAuthor().equals(" ")?"作者:"+datasBean.getAuthor():"分享人:"+datasBean.getShareUser());
             sort.setText(datasBean.getSuperChapterName()+"/"+datasBean.getChapterName());
             long t = datasBean.getPublishTime();
             time.setText(longTime2String(t));
             int collection = SearchUtil.Search(mCollectionIds, datasBean.getId());
-                if (collection!=-1){
-                    mLoveIv.setImageResource(R.mipmap.collect_press);
-                    mLoveIv.setTag(R.mipmap.collect_press);
-                }else {
-                    mLoveIv.setTag(R.mipmap.collect_normal);
-                }
-
-//            LogUtils.d(RecommendAdapter.this,"作者："+datasBean.getAuthor()+"分享人:"+datasBean.getShareUser());
-//            LogUtils.d("DEBUG","datasBean.getTitlte="+datasBean.getTitle());
+            if (collection!=-1){
+                mLoveIv.setImageResource(R.mipmap.collect_press);
+                mLoveIv.setTag(R.mipmap.collect_press);
+            }else {
+                mLoveIv.setTag(R.mipmap.collect_normal);
+            }
 
         }
         private String longTime2String(long time){
             Date date = new Date(time);
             return sdf.format(date);
         }
-
     }
-
-    public void setOnTitleItemClickListener(OnRecommendTitleItemClickListener listener){
+    public void setOnTitleItemClickListener(OnTitleItemClickListener listener){
         this.mContentItemClickListener = listener;
     }
 
-    public interface OnRecommendTitleItemClickListener{
+    public interface OnTitleItemClickListener {
         /**
          * item点击事件
-         * @param data
+         * @param datasBean
          */
-        void onItemClick(RecommendTitle.DataBean.DatasBean data);
+        void onItemClick(SystemArticleList.DataBean.DatasBean datasBean);
         /**
          * 收藏点击事件
          */
-        void onCollectItemClick(ImageView view, RecommendTitle.DataBean.DatasBean data);
+        void onCollectItemClick(ImageView view, SystemArticleList.DataBean.DatasBean datasBean);
 
         /**
          * 取消收藏点击事件
-         * @param data
+         * @param datasBean
          */
-        void onUnCollectItemClick(ImageView view,RecommendTitle.DataBean.DatasBean data);
+        void onUnCollectItemClick(ImageView view, SystemArticleList.DataBean.DatasBean datasBean);
 
     }
 }

@@ -5,22 +5,18 @@ import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.program.wanandroiddemo.R;
-import com.program.wanandroiddemo.base.BaseActivity;
 import com.program.wanandroiddemo.base.BaseApplication;
 import com.program.wanandroiddemo.base.BaseFragment;
-import com.program.wanandroiddemo.model.domain.CollectionArticle;
 import com.program.wanandroiddemo.model.domain.RecommendPagerContent;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
 import com.program.wanandroiddemo.presenter.IRecommendTitlePresenter;
@@ -33,7 +29,6 @@ import com.program.wanandroiddemo.ui.custom.AutoLoopViewPager;
 import com.program.wanandroiddemo.utils.Constants;
 import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.PresenterManager;
-import com.program.wanandroiddemo.utils.SharedPreferencesUtils;
 import com.program.wanandroiddemo.utils.SizeUtils;
 import com.program.wanandroiddemo.utils.ToastUtils;
 import com.program.wanandroiddemo.view.IRecommendTitleCallback;
@@ -167,7 +162,7 @@ public class RecommendFragment extends BaseFragment implements IRecommendTitleCa
             }
         });
 
-        mRecommendAdapter.setOnRecommendTitleItemClickListener(this);
+        mRecommendAdapter.setOnTitleItemClickListener(this);
         mRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(@NonNull RefreshLayout refreshLayout) {

@@ -8,6 +8,7 @@ import com.program.wanandroiddemo.model.domain.CollectionWebsite;
 import com.program.wanandroiddemo.model.domain.Loginout;
 import com.program.wanandroiddemo.model.domain.RecommendPagerContent;
 import com.program.wanandroiddemo.model.domain.RecommendTitle;
+import com.program.wanandroiddemo.model.domain.SystemArticleList;
 import com.program.wanandroiddemo.model.domain.SystemCategories;
 import com.program.wanandroiddemo.model.domain.UnCollectArticle;
 import com.program.wanandroiddemo.model.domain.UnCollectWeb;
@@ -143,6 +144,13 @@ public interface Api {
     @POST("lg/collect/deletetool/json")
     Call<UnCollectWeb> unCollectWeb(@Header("Cookie") String token, @Query("id") int id);
 
+    /**
+     * 获取体系分类
+     * @return
+     */
     @GET("tree/json")
     Call<SystemCategories> getSystemCategories();
+
+    @GET
+    Call<SystemArticleList> getSystemArticleList(@Url String url,@Query("id") int id);
 }

@@ -14,6 +14,7 @@ public class Constants {
 
     public static final String TITLE="TITLE";
     public static final String LINK="LINK";
+    public static final String ID="ID";
 
     public static final int DIALOG_CHOICE_ARTICLE=1;
     public static final int DIALOG_CHOICE_WEB=2;

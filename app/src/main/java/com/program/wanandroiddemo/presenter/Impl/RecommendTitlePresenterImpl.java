@@ -148,8 +148,6 @@ public class RecommendTitlePresenterImpl implements IRecommendTitlePresenter {
 
 
     private void onLoadError() {
-
-
         if (mCallback != null) {
             mCallback.onError();
         }

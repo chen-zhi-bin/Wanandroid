@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.program.wanandroiddemo.R;
 import com.program.wanandroiddemo.base.BaseApplication;
+import com.program.wanandroiddemo.model.domain.SystemChild;
 import com.program.wanandroiddemo.utils.SizeUtils;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class FlowTextLayout extends ViewGroup {
     private int mTextColor;
     private int mBorderColor;
     private float mBorderRadius;
-    private List<String> mData = new ArrayList<>();
+    private List<SystemChild> mData = new ArrayList<>();
     private OnItemClickListener mItemClickListener=null;
     private int mBottom;
 
@@ -66,17 +67,10 @@ public class FlowTextLayout extends ViewGroup {
         mTextColor = a.getColor(R.styleable.FlowTextLayout_textColor, getResources().getColor(R.color.text_grey));
         mBorderColor = a.getColor(R.styleable.FlowTextLayout_borderColor, getResources().getColor(R.color.text_grey));
         mBorderRadius = a.getDimension(R.styleable.FlowTextLayout_borderRadius, DEFAULT_BARDOR_RADIUS);
-        Log.d(TAG,"mMaxLines" + mMaxLine +"\n"+
-                "mHorizoontalMargin" +mHorizoontalMargin+"\n"+
-                "mVertaicalMargin" +mVertaicalMargin+"\n"+
-                "mMaxLength" + mTextMaxLength +"\n"+
-                "mTextColor" +mTextColor+"\n"+
-                "mBorderColor" +mBorderColor+"\n"+
-                "mBorderRadius"+mBorderRadius+"\n");
         a.recycle();
     }
 
-    public void setTextList(List<String> data){
+    public void setTextList(List<SystemChild> data){
         this.mData.clear();
         this.mData.addAll(data);
         Log.d(TAG,"size"+mData.size()+"data ="+data+"\n"
@@ -90,20 +84,21 @@ public class FlowTextLayout extends ViewGroup {
         removeAllViews();
         Random random = new Random();
         //添加子view
-        for (String datum : mData) {
+        for (SystemChild datum : mData) {
             TextView textView= (TextView) LayoutInflater.from(getContext()).inflate(R.layout.item_flow_text,this,false);
             if (mTextMaxLength!=-1){
                 //设置textview的最大长度
                 textView.setFilters(new InputFilter[]{new InputFilter.LengthFilter(mTextMaxLength)});
             }
-            textView.setText(datum);
+            textView.setText(datum.getName());
             Log.d(TAG,"list String ="+textView.getText());
-            final String tempData = datum;
+            final String tempData = datum.getName();
+            final Integer tempId = datum.getId();
             textView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mItemClickListener != null) {
-                        mItemClickListener.onItemClickListener(v,tempData);
+                        mItemClickListener.onItemClickListener(v,tempData,tempId);
                     }
                 }
             });
@@ -126,7 +121,7 @@ public class FlowTextLayout extends ViewGroup {
     }
 
     public interface OnItemClickListener{
-        void onItemClickListener(View v,String text);
+        void onItemClickListener(View v,String text,Integer id);
     }
 
     private List<List<View>> mLines = new ArrayList<>();

@@ -1,9 +1,7 @@
 package com.program.wanandroiddemo.presenter.Impl;
 
-import android.util.Log;
 
 import com.program.wanandroiddemo.model.Api;
-import com.program.wanandroiddemo.model.domain.SystemCateGoriesChild;
 import com.program.wanandroiddemo.model.domain.SystemCategories;
 import com.program.wanandroiddemo.presenter.ISystemFragmentPresenter;
 import com.program.wanandroiddemo.utils.LogUtils;

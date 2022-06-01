@@ -1,5 +1,6 @@
 package com.program.wanandroiddemo.ui.fragment;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,15 +16,18 @@ import com.program.wanandroiddemo.base.BaseApplication;
 import com.program.wanandroiddemo.base.BaseFragment;
 import com.program.wanandroiddemo.model.domain.SystemCategories;
 import com.program.wanandroiddemo.presenter.ISystemFragmentPresenter;
+import com.program.wanandroiddemo.ui.activity.SystemDetailsActivity;
 import com.program.wanandroiddemo.ui.adapter.SystemAdapter;
 import com.program.wanandroiddemo.ui.custom.FlowTextLayout;
+import com.program.wanandroiddemo.utils.Constants;
+import com.program.wanandroiddemo.utils.LogUtils;
 import com.program.wanandroiddemo.utils.PresenterManager;
 import com.program.wanandroiddemo.utils.SizeUtils;
 import com.program.wanandroiddemo.view.ISystemFragmentCallback;
 
 import butterknife.BindView;
 
-public class SystemFragment extends BaseFragment implements ISystemFragmentCallback {
+public class SystemFragment extends BaseFragment implements ISystemFragmentCallback, SystemAdapter.OnSystemItemClickListener {
 
     @BindView(R.id.system_recyclerview)
     public RecyclerView mRecyclerView;
@@ -65,6 +69,11 @@ public class SystemFragment extends BaseFragment implements ISystemFragmentCallb
     }
 
     @Override
+    protected void initListener() {
+        mAdapter.setOnSystemItemClickListener(this);
+    }
+
+    @Override
     protected void initPresenter() {
         mSystemFragmentPresenter = PresenterManager.getInstance().getSystemFragmentPresenter();
         mSystemFragmentPresenter.registerViewCallback(this);
@@ -96,5 +105,13 @@ public class SystemFragment extends BaseFragment implements ISystemFragmentCallb
     @Override
     public void onEmpty() {
         setupState(State.EMPTY);
+    }
+
+    @Override
+    public void systemItemClick(String name, int id) {
+        Intent intent = new Intent(BaseApplication.getAppContext(), SystemDetailsActivity.class);
+        intent.putExtra(Constants.TITLE,name);
+        intent.putExtra(Constants.ID,id);
+        startActivity(intent);
     }
 }

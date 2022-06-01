@@ -12,13 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WanAndroidDemo">
-        <!-- 详情-->
-        <activity android:name=".ui.activity.DetailsActivity"></activity>
-        <!-- 收藏 -->
-        <activity android:name=".ui.activity.user.UserCollectActivity" />
-        <!-- 个人信息 -->
-        <activity android:name=".ui.activity.user.UserInfoActivity" />
-<!--        主页-->
+        <activity android:name=".ui.activity.SystemDetailsActivity"></activity>
+        <!-- 详情 -->
+        <activity android:name=".ui.activity.DetailsActivity" /> <!-- 收藏 -->
+        <activity android:name=".ui.activity.user.UserCollectActivity" /> <!-- 个人信息 -->
+        <activity android:name=".ui.activity.user.UserInfoActivity" /> <!-- 主页 -->
         <activity android:name=".ui.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,8 +24,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <!--登录-->
+        </activity> <!-- 登录 -->
         <activity android:name=".ui.activity.user.UserLoginActivity" />
     </application>
 

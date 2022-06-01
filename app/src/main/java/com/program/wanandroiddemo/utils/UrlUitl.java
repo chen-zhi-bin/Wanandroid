@@ -37,4 +37,13 @@ public class UrlUitl {
     public static String CollectArticle(int id){
         return "lg/collect/"+id+"/json";
     }
+
+    /**
+     * 体系下的文章列表
+     * @param page
+     * @return
+     */
+    public static String getSystemArticle(int page){
+        return "article/list/"+page+"/json";
+    }
 }

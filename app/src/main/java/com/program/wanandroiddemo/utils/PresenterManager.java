@@ -2,6 +2,7 @@ package com.program.wanandroiddemo.utils;
 
 import com.program.wanandroiddemo.presenter.ICollectPresenter;
 import com.program.wanandroiddemo.presenter.IMainActivityDataHandle;
+import com.program.wanandroiddemo.presenter.ISystemDetailsPresenter;
 import com.program.wanandroiddemo.presenter.ISystemFragmentPresenter;
 import com.program.wanandroiddemo.presenter.IUserCollectionArticlePresenter;
 import com.program.wanandroiddemo.presenter.IUserCollectionWebPresentere;
@@ -9,6 +10,7 @@ import com.program.wanandroiddemo.presenter.IUserLoginPresenter;
 import com.program.wanandroiddemo.presenter.IRecommendTitlePresenter;
 import com.program.wanandroiddemo.presenter.IUserPresenter;
 import com.program.wanandroiddemo.presenter.Impl.CollectPresenterlmpl;
+import com.program.wanandroiddemo.presenter.Impl.SystemDetailsPresenterImpl;
 import com.program.wanandroiddemo.presenter.Impl.MainActivityDataHandleImpl;
 import com.program.wanandroiddemo.presenter.Impl.SystemFragmentPresenterImpl;
 import com.program.wanandroiddemo.presenter.Impl.UserCollectionArticlePresenterImpl;
@@ -27,6 +29,7 @@ public class PresenterManager {
     private final ICollectPresenter mCollectPresenterlmpl;
     private final IMainActivityDataHandle mMainActivityDataHandle;
     private final ISystemFragmentPresenter mSystemFragmentPresenter;
+    private final ISystemDetailsPresenter mSystemDetailsPresenter;
 
 
     public static PresenterManager getInstance(){
@@ -67,6 +70,10 @@ public class PresenterManager {
         return mSystemFragmentPresenter;
     }
 
+    public ISystemDetailsPresenter getSystemDetailsPresenter() {
+        return mSystemDetailsPresenter;
+    }
+
     private PresenterManager(){
         mRecommendTitlePresenter = new RecommendTitlePresenterImpl();
         mLoginPresenter = new UserLoginPresenterImpl();
@@ -76,6 +83,7 @@ public class PresenterManager {
         mCollectPresenterlmpl = new CollectPresenterlmpl();
         mMainActivityDataHandle = new MainActivityDataHandleImpl();
         mSystemFragmentPresenter = new SystemFragmentPresenterImpl();
+        mSystemDetailsPresenter = new SystemDetailsPresenterImpl();
     }
 
 }
